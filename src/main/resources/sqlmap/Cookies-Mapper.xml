@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.rency.crawler.dao.CookiesDao">
+	<cache  eviction="FIFO" flushInterval="60000" size="512" readOnly="false"/>
+	<resultMap id="cookiesMapper" type="Cookies">
+		<id property="domian" column="domian" jdbcType="VARCHAR"/>
+		<result property="cookieName" column="cookieName" jdbcType="VARCHAR"/>
+		<result property="cookieValue" column="cookieValue" jdbcType="VARCHAR"/>
+		<result property="isSecure" column="isSecure" jdbcType="BIT"/>
+		<result property="version" column="version" jdbcType="BIGINT"/>
+		<result property="path" column="path" jdbcType="VARCHAR"/>
+		<result property="execDate" column="execDate" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<select id="list" resultType="Cookies">
+		select * from t_crawler_cookies
+	</select>
+	
+	<select id="get" parameterType="String" resultType="Cookies">
+		select * from t_crawler_cookies where domian=#{domian}
+	</select>
+
+	<insert id="save" parameterType="Cookies">
+		insert into t_crawler_cookies (domian, cookieName, cookieValue, isSecure, version, path, execDate)
+		values (#{domian},#{cookieName},#{cookieValue},#{isSecure},#{version},#{path},#{execDate});
+	</insert>
+	
+	<update id="update">
+		update t_crawler_cookies set 
+		<if test="cookieName != null || cookieName != ''">
+			cookieName = #{cookieName},
+		</if>
+		<if test="cookieValue != null || cookieValue != ''">
+			cookieValue = #{cookieValue},
+		</if>
+		<if test="isSecure == true">
+			isSecure = #{isSecure},
+		</if>
+		<if test="version != 0">
+			version = #{version},
+		</if>
+		<if test="path != null || path != ''">
+			path = #{path},
+		</if>
+		<if test="execDate != null">
+			path = #{execDate},
+		</if>
+		where domian = #{domian}
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		delete from t_crawler_cookies where domian=#{domian}
+	</delete>
+	
+	<delete id="deleteAll">
+		delete from t_crawler_cookies
+	</delete>
+	
+</mapper>

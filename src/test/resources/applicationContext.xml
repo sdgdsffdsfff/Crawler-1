@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+         http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+         http://www.springframework.org/schema/context
+         http://www.springframework.org/schema/context/spring-context-4.0.xsd
+         http://www.springframework.org/schema/data/mongo
+         http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd
+         http://www.springframework.org/schema/aop
+         http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+         http://www.springframework.org/schema/tx
+     	 http://www.springframework.org/schema/tx/spring-tx-4.0.xsd" >
+	
+	<import resource="classpath:applicationContext-crawler.xml"/>
+	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/crawler?useUnicode=true&amp;characterEncoding=utf8"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="3306"></property>
+		<property name="maxActive" value="100"></property>
+		<property name="maxIdle" value="30"></property>
+		<property name="maxWait" value="500"></property>
+		<property name="defaultAutoCommit" value="true"></property>
+	</bean>
+	
+	<!-- 配置事务 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="login*" read-only="true" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="list*" read-only="true" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="find*" read-only="true" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="query*" read-only="true" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="get*" read-only="true" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="is*" read-only="true" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="add*" read-only="false" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="save*" read-only="false" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="update*" read-only="false" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="modify*" read-only="false" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="change*" read-only="false" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="delete*" read-only="false" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+			<tx:method name="remove*" read-only="false" propagation="REQUIRED" isolation="READ_COMMITTED" rollback-for="DataAccessException" />
+		</tx:attributes>
+	</tx:advice>
+	
+</beans>

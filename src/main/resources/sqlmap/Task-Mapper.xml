@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.rency.crawler.dao.TaskDao">
+	<cache  eviction="FIFO" flushInterval="60000" size="512" readOnly="false"/>
+	<resultMap id="taskMapper" type="Task">
+		<id property="crawlerId" column="crawlerId" jdbcType="VARCHAR"/>
+		<result property="url" column="url" jdbcType="VARCHAR"/>
+		<result property="host" column="host" jdbcType="VARCHAR"/>
+		<result property="isVisited" column="isVisited" jdbcType="BIT"/>
+		<result property="isDownload" column="isDownload" jdbcType="BIT"/>
+		<result property="statusCode" column="statusCode" jdbcType="BIGINT"/>
+		<result property="timeout" column="timeout" jdbcType="BIGINT"/>
+		<result property="lastModified" column="lastModified" jdbcType="VARCHAR"/>
+		<result property="requestMethod" column="requestMethod" jdbcType="BIGINT"/>
+		<result property="httpParams" column="httpParams" jdbcType="VARCHAR"/>
+		<result property="execDate" column="EXECDATE" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<insert id="save" parameterType="Task">
+		insert into t_crawler_task (crawlerId, url, host, isVisited, isDownload, statusCode, timeout, lastModified, requestMethod, httpParams, execDate)
+		values (#{crawlerId},#{url},#{host},#{isVisited},#{isDownload},#{statusCode},#{timeout},#{lastModified},#{requestMethod},#{httpParams},#{execDate});
+	</insert>
+	
+	<select id="getTaskByUrl" parameterType="String" resultType="Task">
+		select * from t_crawler_task where url=#{url} order by execDate
+	</select>
+	
+	<select id="getTopTask" resultType="Task">
+		select * from t_crawler_task where isVisited=false and timeout = 5 order by execDate
+	</select>
+	
+	<select id="getTaskCount" resultType="int">
+		select count(*) from t_crawler_task
+	</select>
+	
+	<select id="getTaskTimeout" parameterType="String" resultType="int">
+		select * from t_crawler_task where url=#{url} order by execDate
+	</select>
+
+	<select id="getDownloadTaskWithOne" resultType="Task">
+		select * from t_crawler_task where isVisited=true and isDownload=false and timeout = 0 and statusCode =200 order by execDate limit 1
+	</select>
+	
+	<select id="getByUrlAndLastModified" parameterType="Task" resultType="Task">
+		select * from t_crawler_task where url=#{url} and lastModified = #{lastModified} order by asc execDate limit 1
+	</select>
+	
+	<update id="updateTask" parameterType="Task">
+		update t_crawler_task set 
+		<if test="url != null || url != ''">
+			url = #{url},
+		</if>
+		<if test="host != null || host != ''">
+			host = #{host},
+		</if>
+		<if test="isVisited == true">
+			isVisited = #{isVisited},
+		</if>
+		<if test="isDownload == true">
+			isDownload = #{isDownload},
+		</if>
+		<if test="statusCode != 0">
+			statusCode = #{statusCode},
+		</if>
+		<if test="timeout != 0">
+			timeout = #{timeout},
+		</if>
+		<if test="lastModified != null || lastModified != ''">
+			lastModified = #{lastModified},
+		</if>
+		<if test="requestMethod != 0">
+			requestMethod = #{requestMethod},
+		</if>
+		<if test="httpParams != null || httpParams != ''">
+			httpParams = #{httpParams},
+		</if>
+		<if test="execDate != null">
+			path = #{execDate},
+		</if>
+		where crawlerId = #{crawlerId}
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		delete from t_crawler_task where crawlerId=#{crawlerId}
+	</delete>
+	
+	<delete id="deleteByUrl" parameterType="String">
+		delete from t_crawler_task where url=#{url}
+	</delete>
+	
+	<delete id="deleteAll">
+		delete from t_crawler_task
+	</delete>
+	
+</mapper>
