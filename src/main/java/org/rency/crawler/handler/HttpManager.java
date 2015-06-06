@@ -1,4 +1,4 @@
-package org.rency.crawler.core;
+package org.rency.crawler.handler;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -27,14 +27,14 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.rency.commons.toolbox.exception.CoreException;
-import org.rency.commons.toolbox.exception.NotModifiedException;
-import org.rency.commons.toolbox.utils.HttpUtils;
+import org.rency.common.utils.exception.CoreException;
+import org.rency.common.utils.exception.NotModifiedException;
+import org.rency.common.utils.tool.HttpUtils;
 import org.rency.crawler.beans.Cookies;
 import org.rency.crawler.beans.Task;
-import org.rency.crawler.utils.CrawlerDict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 
 public class HttpManager {
 	
@@ -81,7 +81,7 @@ public class HttpManager {
     /**
      * @desc 发送http请求
      * @date 2015年1月9日 下午3:59:17
-     * @param taskQueue
+     * @param task
      * @param cookies
      * @return
      * @throws Exception
@@ -91,10 +91,10 @@ public class HttpManager {
 			//设置cookie
 			setCookie(cookies);
 			
-			if(CrawlerDict.METHOD_POST == task.getRequestMethod()){
-				return post(task);
-			}else{
+			if(task.getHttpMethod().name().equals(HttpMethod.GET.name())){
 				return get(task);
+			}else{
+				return post(task);
 			}
 		}catch(Exception e){
 			logger.error("executing get request url["+task.getUrl()+"].",e);
@@ -106,7 +106,7 @@ public class HttpManager {
     /**
      * @desc 以get方式发送请求
      * @date 2015年1月9日 下午2:34:34
-     * @param taskQueue
+     * @param task
      * @return
      * @throws Exception
      */
@@ -137,19 +137,15 @@ public class HttpManager {
 			throw e;
 		}catch(RuntimeException e){
 			logger.debug("connection["+task.getUrl()+"] error.",e);
-			e.printStackTrace();
 			return null;
 		}catch(ClientProtocolException e){
 			logger.error("executing get request url["+task.getUrl()+"].",e);
-			e.printStackTrace();
 			throw new SocketTimeoutException(e.getMessage());
 		}catch(IOException e){
 			logger.error("executing get request url["+task.getUrl()+"].",e);
-			e.printStackTrace();
 			throw new CoreException(e);
 		}catch(Exception e){
 			logger.error("executing get request url["+task.getUrl()+"].",e);
-			e.printStackTrace();
 			throw new CoreException(e);
 		}
 	}
@@ -157,14 +153,14 @@ public class HttpManager {
 	/**
 	 * @desc 以post方式发送请求
 	 * @date 2015年1月9日 下午2:35:04
-	 * @param taskQueue
+	 * @param task
 	 * @return
 	 * @throws Exception
 	 */
 	private CloseableHttpResponse post(Task task) throws Exception{
 		try{
-			logger.debug("executing url["+task.getUrl()+"] start. and post param is:"+task.getHttpParams());
-			Map<String, String> postMap = HttpUtils.String2Map(task.getHttpParams());
+			logger.debug("executing url["+task.getUrl()+"] start. and post param is:"+task.getParams());
+			Map<String, String> postMap = HttpUtils.String2Map(task.getParams());
 			List<NameValuePair> postParams = new ArrayList<NameValuePair>();
 			for(String key : postMap.keySet()){
 				postParams.add(new BasicNameValuePair(key, postMap.get(key)));
@@ -195,19 +191,15 @@ public class HttpManager {
 			throw e;
 		}catch(RuntimeException e){
 			logger.debug("connection["+task.getUrl()+"] error.",e);
-			e.printStackTrace();
 			return null;
 		}catch(ClientProtocolException e){
 			logger.error("executing post url["+task.getUrl()+"].",e);
-			e.printStackTrace();
 			throw new SocketTimeoutException(e.getMessage());
 		}catch(IOException e){
 			logger.error("executing post url["+task.getUrl()+"].",e);
-			e.printStackTrace();
 			throw new CoreException(e);
 		}catch(Exception e){
 			logger.error("executing post url["+task.getUrl()+"].",e);
-			e.printStackTrace();
 			throw new CoreException(e);
 		}
 	}

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<configuration scan="true" scanPeriod="30 seconds" debug="false">  
+	<property name="logRoot" value="D:/logs/crawler" />   
+
+	<!-- console appender -->  
+	<appender name="CONSOLE-APPENDER" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder charset="UTF-8" />
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
+		</layout>
+	</appender>
+	
+	<!-- default appender -->
+	<appender name="DEFAULT-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder charset="UTF-8" />
+		<file>${logRoot}/default.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logRoot}/default.log.%d{yyyy-MM-dd}</fileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
+		</layout>
+	</appender>
+	
+	<!-- error appender -->
+	<appender name="ERROR-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder charset="UTF-8" />
+		<file>${logRoot}/error.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logRoot}/error.log.%d{yyyy-MM-dd}</fileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
+		</layout>
+	</appender>
+	
+	<!-- common-utils appender -->
+	<appender name="COMMON-UTILS-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder charset="UTF-8" />
+		<file>${logRoot}/common-utils.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logRoot}/common-utils.log.%d{yyyy-MM-dd}</fileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
+		</layout>
+	</appender>
+	
+	<!-- common-dal appender -->
+	<appender name="COMMON-DAL-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder charset="UTF-8" />
+		<file>${logRoot}/common-dal.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logRoot}/common-dal.log.%d{yyyy-MM-dd}</fileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
+		</layout>
+	</appender>
+	
+	<!-- spring+mybatis -->
+	<appender name="FRAMEWORK-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<encoder charset="UTF-8" />
+		<file>${logRoot}/framework.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${logRoot}/framework.log.%d{yyyy-MM-dd}</fileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
+		</layout>
+	</appender>
+
+	<!-- logger -->  
+	<logger name="com.rency.shop.web" additivity="false">
+		<level value="info" />
+		<appender-ref ref="DEFAULT-APPENDER" />
+	</logger>
+	<logger name="com.rency.shop.web" additivity="false">
+		<level value="error" />
+		<appender-ref ref="ERROR-APPENDER" />
+	</logger>
+	<logger name="org.rency.common.utils" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="COMMON-UTILS-APPENDER" />
+	</logger>
+	<logger name="org.rency.dal" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="COMMON-DAL-APPENDER" />
+	</logger>
+	
+	<logger name="org.springframework" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="FRAMEWORK-APPENDER" />
+	</logger>
+	<logger name="org.apache.ibatis" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="FRAMEWORK-APPENDER" />
+	</logger>
+	<logger name="org.mybatis.spring" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="FRAMEWORK-APPENDER" />
+	</logger>
+	
+	<!-- root -->  
+	<root level="debug">  
+		<appender-ref ref="CONSOLE-APPENDER" />
+		<appender-ref ref="DEFAULT-APPENDER" />
+		<appender-ref ref="ERROR-APPENDER" />
+	</root>
+</configuration>

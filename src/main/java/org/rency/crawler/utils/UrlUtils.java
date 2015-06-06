@@ -1,11 +1,11 @@
-package org.rency.crawler.core;
+package org.rency.crawler.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
-public class URLUtil {
+public class UrlUtils {
 
 	/**
 	 * @description:获取完整的URL路径
@@ -31,26 +31,6 @@ public class URLUtil {
 			href = host + href;
 		}
 		return href;
-	}
-	
-	public static String getHost(String url){
-		String host = "";
-		String protocal = url.substring(0, url.indexOf(":/"));
-		if(url.startsWith("http://localhost") || url.startsWith("http://127.0.0.1")){
-			
-		}
-		//String s = "http://download.csdn.net/detail/u011921945/8238127";
-		String s = "http://localhost:8080/dpf/mcanj";
-		Pattern p = Pattern.compile("(?<=//|)((\\w)+\\.)+\\w+");
-		Matcher m = p.matcher(s);
-		if(m.find()){
-			host = m.group();
-		}
-		return host;
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(getHost("http://localhost:8080/dpf/mcanj"));
 	}
 	
 }

@@ -3,15 +3,9 @@ package org.rency.crawler.beans;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
-@Entity
-@Table(name="t_crawler_cookies")
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE)
 public class Cookies implements Serializable{
 
 	/**
@@ -26,6 +20,19 @@ public class Cookies implements Serializable{
 	private int version;
 	private String path;
 	private Date execDate;
+	
+	public Cookies(){
+		this.execDate = new Date();
+	}
+	
+	public Cookies(String domian,String cookieName,String cookieValue,boolean isSecure,int version,String path){
+		this.domian = domian;
+		this.cookieName = cookieName;
+		this.cookieValue = cookieValue;
+		this.isSecure = isSecure;
+		this.version = version;
+		this.path = path;
+	}
 
 	public String getDomian() {
 		return domian;
@@ -84,7 +91,7 @@ public class Cookies implements Serializable{
 	}
 
 	public String toString(){
-		return "{domian:"+domian+", cookieName:"+cookieName+", cookieValue:"+cookieValue+", isSecure:"+isSecure+", version:"+version+", path:"+path+", execDate:"+execDate+"}";
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
 	
 }

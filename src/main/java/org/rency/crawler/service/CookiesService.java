@@ -1,8 +1,7 @@
 package org.rency.crawler.service;
 
 import java.util.List;
-
-import org.rency.commons.toolbox.exception.CoreException;
+import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Cookies;
 
 public interface CookiesService {

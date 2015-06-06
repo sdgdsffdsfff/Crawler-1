@@ -16,7 +16,8 @@
     <context:annotation-config />
     <context:component-scan base-package="org.rency.crawler" />
     
-    <import resource="classpath*:applicationContext-commons-api.xml"/>
+    <import resource="classpath*:applicationContext-common-utils.xml"/>
+    <import resource="classpath*:applicationContext-common-dal.xml"/>
     
     <bean id="crawlerAspect" class="org.rency.crawler.aspect.CrawlerAspect" />
 	<aop:config proxy-target-class="true">
@@ -29,23 +30,26 @@
 		</aop:aspect>
 	</aop:config>
 	
-	<!-- <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="fileEncoding" value="UTF-8" />
 		<property name="locations">
 			<list>
 				<value>classpath:init.properties</value>
+				<value>classpath:mail.properties</value>
 			</list>
 		</property>
-	</bean> -->
+	</bean>
 	
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-		<property name="driverClassName" value="${db.driver}"></property>
-		<property name="url" value="jdbc:mysql://${db.host}:3306/${db.name}?useUnicode=true&amp;characterEncoding=utf8"></property>
-		<property name="username" value="${db.username}"></property>
-		<property name="password" value="${db.password}"></property>
-		<property name="maxActive" value="100"></property>
-		<property name="maxIdle" value="30"></property>
-		<property name="maxWait" value="500"></property>
-		<property name="defaultAutoCommit" value="false"></property>
+		<property name="driverClassName" value="${db.driver}" />
+		<property name="url" value="${db.url}" />
+		<property name="username" value="${db.username}" />
+		<property name="password" value="${db.passwd}" />
+		<property name="maxActive" value="100" />
+		<property name="maxIdle" value="30" />
+		<property name="maxWait" value="500" />
+		<property name="defaultAutoCommit" value="${db.defaultAutoCommit}" />
 	</bean>
 	
 	<!-- 集成mybatis -->
@@ -57,8 +61,45 @@
 	</bean>
 	
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="org.rency.crawler.dao" />
+		<property name="basePackage" value="org.rency.crawler.repository" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
 	</bean>
+	
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="hibernateProperties">
+			<props>
+    			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+    		</props>
+		</property>
+		<property name="packagesToScan">
+			<list>
+				<value></value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 配置事务 -->  
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+    	<property name="dataSource" ref="dataSource" />  
+	</bean> 
+	
+	<!-- Spring线程池 -->
+	<bean id="crawlerTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">  
+        <property name="corePoolSize" value="${thread.corePoolSize}" />  
+        <property name="maxPoolSize" value="${thread.maxPoolSize}" />  
+        <property name="queueCapacity" value="${thread.queueCapacity}" />  
+        <property name="keepAliveSeconds" value="${thread.keepAliveSeconds}" />  
+        <property name="rejectedExecutionHandler">
+        	<!-- 拒绝执行任务的具体操作，AbortPolicy表示抛出RejectedExecutionException异常 -->
+            <bean class="java.util.concurrent.ThreadPoolExecutor$AbortPolicy" />  
+        </property>  
+    </bean>
+    
+    <bean id="httpManager" class="org.rency.crawler.handler.HttpManager" />
 	
 </beans>

@@ -1,9 +1,11 @@
-package org.rency.crawler.service;
+package org.rency.crawler.repository;
 
 import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Task;
+import org.springframework.stereotype.Repository;
 
-public interface TaskService {
+@Repository("taskRepository")
+public interface TaskRepository {
 
 	public void save(Task task) throws CoreException;
 	
@@ -24,4 +26,5 @@ public interface TaskService {
 	public void deleteByCrawler(String crawlerId) throws CoreException;
 	
 	public void deleteAll() throws CoreException;
+	
 }

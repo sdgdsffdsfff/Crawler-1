@@ -1,4 +1,4 @@
-package org.rency.crawler.core;
+package org.rency.crawler.handler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -7,17 +7,25 @@ import org.apache.commons.lang.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.rency.commons.toolbox.exception.CoreException;
-import org.rency.commons.toolbox.utils.HttpUtils;
+import org.rency.common.utils.domain.SpringContextHolder;
+import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Task;
-import org.rency.crawler.utils.CrawlerDict;
+import org.rency.crawler.service.TaskService;
+import org.rency.crawler.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpMethod;
 
-public class URLSearch {
+public class URLHandler {
 	
-	private static final Logger logger = LoggerFactory.getLogger(URLSearch.class);
+	private static final Logger logger = LoggerFactory.getLogger(URLHandler.class);
+	
+	@Autowired
+	@Qualifier("crawlerTaskExecutor")
+	private static TaskExecutor taskExecutor;
 	
 	/**
 	 * @desc 提取页面中的超链接
@@ -25,17 +33,20 @@ public class URLSearch {
 	 * @param doc 页面
 	 * @throws CoreException
 	 */
-	public static void parseHref(CrawlerConfiguration cfg,Document doc) throws CoreException{
+	public static void parseHref(Document doc) throws CoreException{
 		try{
 			String host = doc.baseUri();
 			Elements hrefs = doc.select("a[href]");
 			for(Element ele : hrefs){
-				String url = URLUtil.getFillUrl(ele.attr("abs:href").trim(), host);
+				String url = UrlUtils.getFillUrl(ele.attr("abs:href").trim(), host);
 				if(StringUtils.isBlank(url)){
 					continue;
 				}
-				Task newTask = new Task(cfg.getCrawlerId(),host,url,CrawlerDict.METHOD_POST);
-				commitTask(cfg,newTask);
+				Task task = new Task();
+				task.setUrl(url);
+				task.setHost(host);
+				task.setHttpMethod(HttpMethod.GET);
+				commitTask(task);
 			}
 		}catch(Exception e){
 			logger.error("解析页面提取Href时异常."+doc.html(),e);
@@ -50,29 +61,17 @@ public class URLSearch {
 	 * @param doc
 	 * @throws CoreException
 	 */
-	public static void parseForm(CrawlerConfiguration cfg,Document doc) throws CoreException{
+	public static void parseForm(Document doc) throws CoreException{
 		try{
 			String host = doc.baseUri();
 			Elements forms = doc.select("form[action]");
 			for(Element form : forms){
-				String url = URLUtil.getFillUrl(form.attr("abs:action").trim(), host);
+				String url = UrlUtils.getFillUrl(form.attr("abs:action").trim(), host);
 				if(StringUtils.isBlank(url)){
 					continue;
 				}
 				
 				Map<String, String> postParam = new HashMap<String, String>();
-				
-				//判断表单提交的方式
-				int requestMethod = 0;
-				String method = form.attr("method").trim().toUpperCase();
-				if(HttpMethod.GET.equals(method)){
-					requestMethod = CrawlerDict.METHOD_GET;
-				}else if(HttpMethod.POST.equals(method)){
-					requestMethod = CrawlerDict.METHOD_POST;
-				}else{
-					requestMethod = CrawlerDict.METHOD_GET;
-				}
-				
 				Elements inputs = form.select("input");
 				for(Element input : inputs){
 					String key = input.attr("name");
@@ -82,8 +81,6 @@ public class URLSearch {
 					}					
 					postParam.put(key, value);
 				}
-				Task newTask = new Task(cfg.getCrawlerId(),host,url,requestMethod,HttpUtils.Map2String(postParam));
-				commitTask(cfg,newTask);
 			}
 		}catch(Exception e){
 			logger.error("解析页面表单Action时异常."+doc.html(),e);
@@ -99,7 +96,7 @@ public class URLSearch {
 	 * @param doc
 	 * @throws CoreException 
 	 */
-	public static void parseScript(CrawlerConfiguration cfg,Document doc) throws CoreException{
+	public static void parseScript(Document doc) throws CoreException{
 		try{
 			Elements scripts = doc.select("script");
 			for(Element ele : scripts){
@@ -121,22 +118,17 @@ public class URLSearch {
 	/**
 	 * @desc 提交新的页面抓取任务
 	 * @date 2015年1月9日 下午1:57:24
-	 * @param cfg
-	 * @param uri 域名
-	 * @param href URL超链接
+	 * @param task
 	 * @throws CoreException
 	 */
-	private static void commitTask(CrawlerConfiguration cfg,Task newTask) throws CoreException{
+	private static void commitTask(Task task) throws CoreException{
 		try{
-			boolean isSave = cfg.getTaskService().add(newTask);
-			logger.debug("add new taskQueue["+newTask.toString()+"] result:"+isSave);
-			
-			//提交新的页面解析任务
-			cfg.getParserExecutor().execute(new PageParser(cfg,newTask));
-			logger.debug("add new page parser task["+newTask.toString()+"]");
+			TaskService taskService = SpringContextHolder.getBean(TaskService.class);
+			taskService.save(task);
+			logger.debug("add new task["+task.toString()+"] ");
+			taskExecutor.execute(new TaskHandler(task));
 		}catch(Exception e){
-			logger.error("提交新任务异常.taskQueue:"+newTask.toString(),e);
-			e.printStackTrace();
+			logger.error("提交新任务异常.task:"+task.toString(),e);
 			throw new CoreException(e);
 		}
 	}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.rency.crawler.repository.PagesRepository">
+	<cache  eviction="FIFO" flushInterval="60000" size="512" readOnly="false"/>
+	
+	<select id="list" resultType="Pages">
+		select * from t_crawler_pages
+	</select>
+	
+	<select id="get" parameterType="Pages" resultType="Pages">
+		select * from t_crawler_pages where url=#{url} and sign=#{sign}
+	</select>
+	
+	<select id="getUnIndexerWithOne" resultType="Pages">
+		select * from t_crawler_pages where isCreateIndex=false order by asc execDate limit 1
+	</select>
+	
+	<insert id="save" parameterType="Pages">
+		insert into t_crawler_pages (url, html, sign, charset, title, keywords, description, isCreateIndex,execDate)
+		values (#{url},#{html},#{sign},#{charset},#{title},#{keywords},#{description},#{isCreateIndex},#{execDate});
+	</insert>
+	
+	<update id="update" parameterType="Pages">
+		update t_crawler_pages set 
+		
+		<if test="html != null || html != ''">
+			html=#{html},
+		</if>
+		<if test="charset != null || charset != ''">
+			charset=#{charset},
+		</if>
+		<if test="title != null || title != ''">
+			title=#{title},
+		</if>
+		<if test="keywords != null || keywords != ''">
+			keywords=#{keywords},
+		</if>
+		<if test="description != null || description != ''">
+			description=#{description},
+		</if>
+		<if test="isCreateIndex == true">
+			isCreateIndex=#{isCreateIndex},
+		</if>
+		<if test="execDate != null">
+			execDate=#{execDate},
+		</if>
+		where url=#{url} and sign=#{sign}
+	</update>
+	
+	<delete id="delete" parameterType="Pages">
+		delete from t_crawler_pages where url=#{url} and sign=#{sign}
+	</delete>
+	
+	<delete id="deleteAll">
+		delete from t_crawler_pages
+	</delete>
+	
+</mapper>

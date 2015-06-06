@@ -3,11 +3,18 @@ package org.rency.crawler.beans;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Id;
+import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
+import org.springframework.http.HttpMethod;
 
-import org.rency.crawler.utils.CrawlerDict;
-import org.springframework.format.annotation.DateTimeFormat;
-
+/**
+ * 抓取队列
+* @ClassName: FetchQueue 
+* @Description: TODO
+* @Author user_rcy@163.com
+* @Date 2015年6月6日 下午12:36:58 
+*
+ */
 public class Task implements Serializable{
 	
 	/**
@@ -15,70 +22,55 @@ public class Task implements Serializable{
 	 */
 	private static final long serialVersionUID = 6004790568824598869L;
 
+	/**
+	 * 抓取该任务的爬虫标示
+	 */
 	private String crawlerId;
 	
-	private String url = "";
+	/**
+	 * 抓取地址
+	 */
+	private String url;
 	
-	private String host = "";
+	/**
+	 * 抓取域名
+	 */
+	private String host;
 	
-	private boolean isVisited;
-	
+	/**
+	 * 是否已下载
+	 */
 	private boolean isDownload;
 	
+	/**
+	 * 抓取状态
+	 */
 	private int statusCode;
 	
-	private int timeout;
+	/**
+	 * 重试次数
+	 */
+	private int retryCount;
 	
-	private String lastModified = "";
+	/**
+	 * 页面最后修改时间
+	 */
+	private String lastModified;
 	
-	private int requestMethod;
+	/**
+	 * Http请求方式
+	 */
+	private HttpMethod httpMethod;
 	
-	private String httpParams = "";
+	/**
+	 * 访问需要的参数
+	 */
+	private String params;
 	
 	private Date execDate;
 	
-	/**
-	 * 默认将会以get方式提交请求
-	 */
 	public Task(){
 		this.execDate = new Date();
-		this.isVisited = false;
-		this.isDownload = false;
-		this.timeout = 0;
-		this.requestMethod = CrawlerDict.METHOD_GET;
-	}
-	
-	public Task(String crawlerId,String url,int requestMethod){
-		this.crawlerId = crawlerId;
-		this.url=url;
-		this.execDate = new Date();
-		this.isVisited = false;
-		this.isDownload = false;
-		this.timeout = 0;
-		this.requestMethod = requestMethod;
-	}
-	
-	public Task(String crawlerId,String host,String url,int requestMethod){
-		this.crawlerId = crawlerId;
-		this.host = host;
-		this.url=url;
-		this.execDate = new Date();
-		this.isVisited = false;
-		this.isDownload = false;
-		this.timeout = 0;
-		this.requestMethod = requestMethod;
-	}
-	
-	public Task(String crawlerId,String host,String url,int requestMethod,String httpParams){
-		this.crawlerId = crawlerId;
-		this.host = host;
-		this.url=url;
-		this.execDate = new Date();
-		this.isVisited = false;
-		this.isDownload = false;
-		this.timeout = 0;
-		this.requestMethod = requestMethod;
-		this.httpParams = httpParams;
 	}
 
 	public String getCrawlerId() {
@@ -89,7 +81,6 @@ public class Task implements Serializable{
 		this.crawlerId = crawlerId;
 	}
 
-	@Id
 	public String getUrl() {
 		return url;
 	}
@@ -104,14 +95,6 @@ public class Task implements Serializable{
 
 	public void setHost(String host) {
 		this.host = host;
-	}
-
-	public boolean isVisited() {
-		return isVisited;
-	}
-
-	public void setVisited(boolean isVisited) {
-		this.isVisited = isVisited;
 	}
 
 	public boolean isDownload() {
@@ -130,12 +113,12 @@ public class Task implements Serializable{
 		this.statusCode = statusCode;
 	}
 
-	public int getTimeout() {
-		return timeout;
+	public int getRetryCount() {
+		return retryCount;
 	}
 
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
+	public void setRetryCount(int retryCount) {
+		this.retryCount = retryCount;
 	}
 
 	public String getLastModified() {
@@ -146,23 +129,22 @@ public class Task implements Serializable{
 		this.lastModified = lastModified;
 	}
 
-	public int getRequestMethod() {
-		return requestMethod;
+	public HttpMethod getHttpMethod() {
+		return httpMethod;
 	}
 
-	public void setRequestMethod(int requestMethod) {
-		this.requestMethod = requestMethod;
+	public void setHttpMethod(HttpMethod httpMethod) {
+		this.httpMethod = httpMethod;
 	}
 
-	public String getHttpParams() {
-		return httpParams;
+	public String getParams() {
+		return params;
 	}
 
-	public void setHttpParams(String httpParams) {
-		this.httpParams = httpParams;
+	public void setParams(String params) {
+		this.params = params;
 	}
 
-	@DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	public Date getExecDate() {
 		return execDate;
 	}
@@ -172,7 +154,7 @@ public class Task implements Serializable{
 	}
 	
 	public String toString(){
-		return "{crawlerId:"+crawlerId+", url:"+url+", host:"+host+", isVisited:"+isVisited+", isDownload:"+isDownload+", statusCode:"+statusCode+", timeout:"+timeout+", lastModified:"+lastModified+", requestMethod:"+requestMethod+", httpParams:"+httpParams+", execDate:"+execDate+"}";
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
 	
 }

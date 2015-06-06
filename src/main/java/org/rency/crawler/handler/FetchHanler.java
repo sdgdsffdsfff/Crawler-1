@@ -1,8 +1,7 @@
-package org.rency.crawler.core;
+package org.rency.crawler.handler;
 
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
@@ -13,50 +12,55 @@ import org.apache.http.cookie.Cookie;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.rency.commons.toolbox.exception.CoreException;
+import org.rency.common.utils.domain.SpringContextHolder;
+import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Cookies;
 import org.rency.crawler.beans.Task;
 import org.rency.crawler.service.CookiesService;
 import org.rency.crawler.service.TaskService;
+import org.rency.crawler.utils.ConvertUtils;
 import org.rency.crawler.utils.CrawlerDict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 
 /**
- * @desc 查找、分析互联网URL超链接
- * @author T-rency
- * @date 2015年1月8日 下午3:53:42
+ * 抓取
+* @ClassName: FetchHanler 
+* @Description: TODO
+* @Author user_rcy@163.com
+* @Date 2015年6月6日 下午1:31:43 
+*
  */
-public class PageParser implements Runnable{
+public class FetchHanler {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PageParser.class);
-	
-	private TaskService taskService;
+	@Autowired
+	@Qualifier("cookiesService")
 	private CookiesService cookiesService;
-	private final Task task;
-	private final CrawlerConfiguration cfg;
 	
-	public PageParser(CrawlerConfiguration crawlerConfiuration,Task task){
-		this.cfg = crawlerConfiuration;
-		this.task = task;
-		this.taskService = crawlerConfiuration.getTaskService();
-		this.cookiesService = crawlerConfiuration.getCookiesService();
-	}
-
-	@Override
-	public void run(){
+	@Autowired
+	@Qualifier("taskService")
+	private TaskService taskService;
+	
+	@Autowired
+	@Qualifier("crawlerTaskExecutor")
+	private TaskExecutor taskExecutor;
+	
+	private static final Logger logger = LoggerFactory.getLogger(FetchHanler.class);
+	
+	public void taskHandler(Task task){
 		try{
-			this.cfg.setNewTaskDate(new Date());
-			parse();
+			parse(task);
 		}catch(SocketTimeoutException e){
 			try {
-				int timeout = taskService.queryTaskTimeout(task.getUrl());
+				int timeout = taskService.getRetryCount(task.getUrl());
 				if(timeout < CrawlerDict.RETRY_COUNT){
 					timeout++;
-					task.setTimeout(timeout);
-					task.setVisited(true);
-					taskService.updateTask(task);
-					run();
+					task.setRetryCount(timeout);
+					taskService.update(task);
+					taskHandler(task);
 				}
 				logger.debug("get target address["+task.getUrl()+"] timeout:"+timeout);
 			} catch (CoreException e1) {
@@ -65,7 +69,6 @@ public class PageParser implements Runnable{
 			}
 		}catch(Exception e){
 			logger.error("parse page["+task.getUrl()+"] error.",e);
-			e.printStackTrace();
 		}
 	}
 	
@@ -74,10 +77,10 @@ public class PageParser implements Runnable{
 	 * @date 2015年1月8日 下午3:54:31
 	 * @throws Exception
 	 */
-	private void parse() throws Exception{
+	private void parse(Task task) throws Exception{
 		try{
 			//判断URL是否已访问过
-			if(taskService.isVisited(task)){
+			if(taskService.get(task.getUrl()) != null){
 				return ;
 			}
 			
@@ -91,7 +94,7 @@ public class PageParser implements Runnable{
 			}
 			
 			//HttpClient组件请求Http
-			HttpManager httpManager= this.cfg.getHttpManager();
+			HttpManager httpManager= SpringContextHolder.getBean(HttpManager.class);
 			CloseableHttpResponse response = httpManager.execute(task,cookies);
 			if(response == null){
 				return;
@@ -111,29 +114,27 @@ public class PageParser implements Runnable{
 			/**
 			 * 提取页面中Href超链接
 			 */
-			URLSearch.parseHref(cfg,doc);
+			URLHandler.parseHref(doc);
 			
 			/**
 			 * 提取表单的Action
 			 */
-			URLSearch.parseForm(cfg,doc);
+			URLHandler.parseForm(doc);
 			
 			/**
 			 * 解析执行Javascript代码
 			 */
-			URLSearch.parseScript(cfg,doc);
+			URLHandler.parseScript(doc);
 			
 			//更新队列任务状态
 			task.setHost(uri);
 			task.setStatusCode(httpManager.getStatusCode());
-			task.setVisited(true);
-			taskService.updateTask(task);
+			taskService.update(task);
 			
 			/**
 			 * 提交保存页面任务
 			 */
-			this.cfg.getSaveExecutor().execute(new PageSaver(this.cfg,task,doc));
-			
+			taskExecutor.execute(new TaskHandler(ConvertUtils.toPages(task, doc)));
 		}catch(RejectedExecutionException e){
 			logger.debug("crawler executor service force stoped...",e);
 			return;
@@ -144,11 +145,10 @@ public class PageParser implements Runnable{
 			throw new SocketTimeoutException(e.getMessage());
 		}catch(Exception e){
 			logger.error("parse page["+task.getUrl()+"] error.",e);
-			e.printStackTrace();
 			throw new CoreException(e);
 		}
 	}
-	
+
 	/**
 	 * @desc 保存Cookie
 	 * @date 2014年12月19日 下午2:48:52
@@ -173,5 +173,5 @@ public class PageParser implements Runnable{
 			}
 		}
 	}
-
+	
 }
