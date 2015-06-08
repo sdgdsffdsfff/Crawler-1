@@ -1,5 +1,6 @@
 package org.rency.crawler.handler;
 
+import org.rency.common.utils.domain.SpringContextHolder;
 import org.rency.common.utils.exception.StoreException;
 import org.rency.crawler.beans.Pages;
 import org.rency.crawler.beans.Task;
@@ -8,8 +9,6 @@ import org.rency.crawler.service.TaskService;
 import org.rency.crawler.utils.CrawlerDict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * 存储
@@ -19,7 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 * @Date 2015年6月6日 下午1:31:37 
 *
  */
-public class StoreHandler {
+public class StoreHandler{
 	
 	private static final Logger logger = LoggerFactory.getLogger(StoreHandler.class);
 	
@@ -28,13 +27,14 @@ public class StoreHandler {
 	 */
 	private int retryCount = 0;
 	
-	@Autowired
-	@Qualifier("taskService")
 	private TaskService taskService;
 	
-	@Autowired
-	@Qualifier("pagesService")
 	private PagesService pagesService;
+	
+	public StoreHandler(){
+		taskService = SpringContextHolder.getBean(TaskService.class);
+		pagesService = SpringContextHolder.getBean(PagesService.class);
+	}
 
 	/**
 	 * 保存页面
@@ -44,10 +44,11 @@ public class StoreHandler {
 	* @param pages
 	 */
 	public void store(Pages pages) {
+		if(pages == null){
+			return;
+		}
+		logger.debug("执行保存任务."+pages.toString());
 		try{
-			if(pages == null){
-				return;
-			}
 			save(pages);
 		}catch(StoreException e){
 			//睡眠2秒

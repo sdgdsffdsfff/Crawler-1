@@ -31,11 +31,11 @@ public class TaskHandler implements Runnable {
 	public void run() {
 		if(targetTask instanceof Task){
 			Task task = (Task) targetTask;
-			logger.debug("执行抓取任务."+task.toString());
+			logger.debug("提交抓取任务."+task.toString());
 			new FetchHanler().taskHandler(task);
 		}else if(targetTask instanceof Pages){
 			Pages pages = (Pages) targetTask;
-			logger.debug("执行存储任务."+pages.toString());
+			logger.debug("提交存储任务."+pages.toString());
 			new StoreHandler().store(pages);
 		}else{
 			logger.debug("未知任务类型，拒绝执行."+targetTask);

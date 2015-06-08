@@ -10,7 +10,11 @@
 	</insert>
 	
 	<select id="get" parameterType="String" resultType="Task">
-		select * from t_crawler_task where url=#{url} order by execDate for update
+		select * from t_crawler_task where url=#{url} order by execDate
+	</select>
+	
+	<select id="isFetch" parameterType="String" resultType="int">
+		select count(url) from t_crawler_task where url=#{url} and statusCode=0 and retryCount=0
 	</select>
 	
 	<select id="getTop" resultType="Task">

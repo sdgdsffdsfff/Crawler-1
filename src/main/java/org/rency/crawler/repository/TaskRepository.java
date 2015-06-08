@@ -11,6 +11,8 @@ public interface TaskRepository {
 	
 	public Task get(String url) throws CoreException;
 	
+	public Integer isFetch(String url) throws CoreException; 
+	
 	public Task getTop() throws CoreException;
 	
 	public Integer getCount() throws CoreException;

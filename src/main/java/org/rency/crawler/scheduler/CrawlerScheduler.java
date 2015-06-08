@@ -13,8 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -36,7 +36,7 @@ public class CrawlerScheduler {
 	
 	@Autowired
 	@Qualifier("crawlerTaskExecutor")
-	private TaskExecutor taskExecutor;
+	private ThreadPoolTaskExecutor taskExecutor;
 
 	/**
 	 * 启动爬虫
@@ -61,6 +61,19 @@ public class CrawlerScheduler {
 		}catch(IOException e){
 			logger.error(Errors.NET_NOTFOUND.getMessage()+"{}",netAddr,e);
 			throw new CoreException(Errors.NET_NOTFOUND);
+		}
+		boolean isExec = true;
+		while(isExec){
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+			}
+			int activeCount = taskExecutor.getActiveCount();
+			if(activeCount == 0){
+				taskExecutor.shutdown();
+				isExec = false;
+				System.out.println("线程池结束");
+			}
 		}
 	}
 }

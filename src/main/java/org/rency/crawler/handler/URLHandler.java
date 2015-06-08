@@ -16,8 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class URLHandler {
 	
@@ -25,7 +25,7 @@ public class URLHandler {
 	
 	@Autowired
 	@Qualifier("crawlerTaskExecutor")
-	private static TaskExecutor taskExecutor;
+	private static ThreadPoolTaskExecutor taskExecutor;
 	
 	/**
 	 * @desc 提取页面中的超链接

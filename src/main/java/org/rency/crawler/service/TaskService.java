@@ -9,6 +9,8 @@ public interface TaskService {
 	
 	public Task get(String url) throws CoreException;
 	
+	public boolean isFetch(String url) throws CoreException; 
+	
 	public Task getTop() throws CoreException;
 	
 	public Integer getCount() throws CoreException;

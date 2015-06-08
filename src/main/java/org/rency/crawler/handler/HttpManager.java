@@ -287,8 +287,9 @@ public class HttpManager {
 					}
 				}; 
 				cookieStore.addCookie(cookie);
+				context.setCookieStore(cookieStore);
 			}
-			context.setCookieStore(cookieStore);
+			
 		}catch(Exception e){
 			logger.error("setCookie["+cookies+"] error.",e);
 			e.printStackTrace();

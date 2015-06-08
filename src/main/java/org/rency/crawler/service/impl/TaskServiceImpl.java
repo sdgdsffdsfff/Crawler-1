@@ -27,6 +27,15 @@ public class TaskServiceImpl implements TaskService {
 	public Task get(String url) throws CoreException {
 		return taskRepository.get(url);
 	}
+	
+	@Override
+	public boolean isFetch(String url) throws CoreException{
+		int count = taskRepository.isFetch(url);
+		if(count > 0){
+			return false;
+		}
+		return true;
+	}
 
 	@Override
 	public Task getTop() throws CoreException {
