@@ -13,6 +13,7 @@ import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.service.CookiesService;
 import org.rency.crawler.service.PagesService;
 import org.rency.crawler.service.TaskService;
+import org.rency.dal.sequence.Sequence;
 import org.rency.dal.sequence.service.SequenceRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
@@ -23,6 +24,7 @@ public class CrawlerSchedulerTest {
 	private TaskService taskService;
 	private PagesService pagesService;
 	private CrawlerScheduler crawlerScheduler;
+	private SequenceRepository sequenceRepository;
 	
 	@Before
 	public void before() throws SQLException{
@@ -32,7 +34,7 @@ public class CrawlerSchedulerTest {
 		taskService = ctx.getBean(TaskService.class);
 		pagesService = ctx.getBean(PagesService.class);
 		crawlerScheduler = ctx.getBean(CrawlerScheduler.class);
-		SequenceRepository sequenceRepository = ctx.getBean(SequenceRepository.class);
+		sequenceRepository = ctx.getBean(SequenceRepository.class);
 		Map<String, String> createMap = readCreateSQL();
 		if(!createMap.isEmpty() || createMap != null){
 			for(String tableName : createMap.keySet()){
@@ -47,6 +49,19 @@ public class CrawlerSchedulerTest {
 		cookiesService.deleteAll();
 		taskService.deleteAll();
 		pagesService.deleteAll();
+	}
+	
+	@Test
+	public void testAddSequence() throws CoreException{
+		Sequence sequence= new Sequence();
+		sequence.setName("CRAWLER");
+		sequence.setCurrentValue(1000000L);
+		sequence.setIncrement(1);
+		sequence.setTotal(20);
+		sequence.setThreshold(5);
+		if(sequenceRepository.find(sequence.getName()) == null){
+			sequenceRepository.save(sequence);
+		}
 	}
 	
 	@Test
