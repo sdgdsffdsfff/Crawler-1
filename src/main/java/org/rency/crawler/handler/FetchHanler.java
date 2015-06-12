@@ -64,7 +64,7 @@ public class FetchHanler{
 	private void parse(Task task) throws Exception{
 		try{
 			//判断URL是否已访问过
-			if(taskService.isFetch(task.getUrl())){
+			if(!taskService.isFetch(task.getUrl())){
 				return ;
 			}
 			
@@ -87,7 +87,7 @@ public class FetchHanler{
 			String html = EntityUtils.toString(entity);
 			httpManager.closeResources(response);
 			Document doc = Jsoup.parse(html);
-			String uri = StringUtils.isBlank(doc.baseUri()) ? task.getHost() : doc.baseUri();
+			String uri = StringUtils.isBlank(task.getHost()) ? doc.baseUri() : task.getHost();
 			
 			//保存cookie
 			if(cookies ==null){
@@ -97,17 +97,17 @@ public class FetchHanler{
 			/**
 			 * 提取页面中Href超链接
 			 */
-			URLHandler.parseHref(doc);
+			URLHandler.fetchHref(doc,uri);
 			
 			/**
 			 * 提取表单的Action
 			 */
-			URLHandler.parseForm(doc);
+			URLHandler.fetchForm(doc);
 			
 			/**
 			 * 解析执行Javascript代码
 			 */
-			URLHandler.parseScript(doc);
+			URLHandler.fetchScript(doc);
 			
 			//更新队列任务状态
 			task.setHost(uri);

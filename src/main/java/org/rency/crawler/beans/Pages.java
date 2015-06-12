@@ -21,6 +21,11 @@ public class Pages implements Serializable {
 	 * 页面内容
 	 */
 	private String html;
+	
+	/**
+	 * 页面文本内容
+	 */
+	private String content;
 	/**
 	 * 页面签名
 	 */
@@ -70,6 +75,14 @@ public class Pages implements Serializable {
 		this.html = html;
 	}
 
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
 
 	public String getSign() {
 		return sign;

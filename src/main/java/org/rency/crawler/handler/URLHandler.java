@@ -14,8 +14,6 @@ import org.rency.crawler.service.TaskService;
 import org.rency.crawler.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -23,22 +21,19 @@ public class URLHandler {
 	
 	private static final Logger logger = LoggerFactory.getLogger(URLHandler.class);
 	
-	@Autowired
-	@Qualifier("crawlerTaskExecutor")
-	private static ThreadPoolTaskExecutor taskExecutor;
-	
 	/**
 	 * @desc 提取页面中的超链接
 	 * @date 2015年1月8日 下午3:45:33
 	 * @param doc 页面
+	 * @param host
 	 * @throws CoreException
 	 */
-	public static void parseHref(Document doc) throws CoreException{
+	public static void fetchHref(Document doc,String host) throws CoreException{
 		try{
-			String host = doc.baseUri();
 			Elements hrefs = doc.select("a[href]");
 			for(Element ele : hrefs){
-				String url = UrlUtils.getFillUrl(ele.attr("abs:href").trim(), host);
+				String eleUrl = StringUtils.isBlank(ele.attr("abs:href"))? ele.attr("href").trim() : ele.attr("abs:href").trim();
+				String url = UrlUtils.getFillUrl(eleUrl, host);
 				if(StringUtils.isBlank(url)){
 					continue;
 				}
@@ -61,7 +56,7 @@ public class URLHandler {
 	 * @param doc
 	 * @throws CoreException
 	 */
-	public static void parseForm(Document doc) throws CoreException{
+	public static void fetchForm(Document doc) throws CoreException{
 		try{
 			String host = doc.baseUri();
 			Elements forms = doc.select("form[action]");
@@ -96,7 +91,7 @@ public class URLHandler {
 	 * @param doc
 	 * @throws CoreException 
 	 */
-	public static void parseScript(Document doc) throws CoreException{
+	public static void fetchScript(Document doc) throws CoreException{
 		try{
 			Elements scripts = doc.select("script");
 			for(Element ele : scripts){
@@ -122,11 +117,13 @@ public class URLHandler {
 	 * @throws CoreException
 	 */
 	private static void commitTask(Task task) throws CoreException{
+		ThreadPoolTaskExecutor taskExecutor = (ThreadPoolTaskExecutor) SpringContextHolder.getBean("crawlerTaskExecutor");
 		try{
 			TaskService taskService = SpringContextHolder.getBean(TaskService.class);
-			taskService.save(task);
-			logger.debug("add new task["+task.toString()+"] ");
-			taskExecutor.execute(new TaskHandler(task));
+			if(taskService.save(task)){
+				logger.debug("add new task["+task.toString()+"] ");
+				taskExecutor.execute(new TaskHandler(task));
+			}			
 		}catch(Exception e){
 			logger.error("提交新任务异常.task:"+task.toString(),e);
 			throw new CoreException(e);

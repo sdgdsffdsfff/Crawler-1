@@ -43,12 +43,13 @@ public class ConvertUtils {
 			page.setTitle(doc.title());
 			String pageContent = doc.text();
 			page.setHtml(doc.html());
+			page.setContent(pageContent);
 			page.setUrl(task.getUrl());
 			page.setSign(MD5Utils.getMD5String(pageContent));
 			return page;
 		}catch(Exception e){
-			logger.error("任务转换页面对象异常,{},{}",task,doc,e);
-			throw new ConvertException();
+			logger.warn("队列任务转换对象异常,{},{}",task,doc,e);
+			return null;
 		}
 	}
 }

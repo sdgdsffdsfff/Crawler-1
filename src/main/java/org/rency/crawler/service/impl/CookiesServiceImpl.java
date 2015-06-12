@@ -2,7 +2,7 @@ package org.rency.crawler.service.impl;
 
 import java.util.List;
 
-import org.rency.common.utils.exception.CoreException;
+import org.rency.common.utils.exception.StoreException;
 import org.rency.crawler.beans.Cookies;
 import org.rency.crawler.repository.CookiesRepository;
 import org.rency.crawler.service.CookiesService;
@@ -18,33 +18,33 @@ public class CookiesServiceImpl implements CookiesService {
 	private CookiesRepository cookiesRepository;
 	
 	@Override
-	public List<Cookies> list() throws CoreException {
+	public List<Cookies> list() throws StoreException {
 		return cookiesRepository.list();
 	}
 
 	@Override
-	public Cookies query(String domian) throws CoreException {
-		return cookiesRepository.get(domian);
+	public Cookies query(String host) throws StoreException {
+		return cookiesRepository.get(host);
 	}
 
 	@Override
-	public boolean add(Cookies cookies) throws CoreException {
-		return cookiesRepository.save(cookies);
+	public boolean add(Cookies cookies) throws StoreException {
+		return cookiesRepository.save(cookies) > 0;
 	}
 
 	@Override
-	public boolean update(Cookies cookies) throws CoreException {
-		return cookiesRepository.update(cookies);
+	public boolean update(Cookies cookies) throws StoreException {
+		return cookiesRepository.update(cookies) > 0;
 	}
 
 	@Override
-	public boolean delete(String domian) throws CoreException {
-		return cookiesRepository.delete(domian);
+	public boolean delete(String host) throws StoreException {
+		return cookiesRepository.delete(host) > 0;
 	}
 
 	@Override
-	public boolean deleteAll() throws CoreException {
-		return cookiesRepository.deleteAll();
+	public boolean deleteAll() throws StoreException {
+		return cookiesRepository.deleteAll() > 0;
 	}
 
 }

@@ -1,32 +1,32 @@
 package org.rency.crawler.repository;
 
-import org.rency.common.utils.exception.CoreException;
+import org.rency.common.utils.exception.StoreException;
 import org.rency.crawler.beans.Task;
 import org.springframework.stereotype.Repository;
 
 @Repository("taskRepository")
 public interface TaskRepository {
 
-	public void save(Task task) throws CoreException;
+	public Integer save(Task task) throws StoreException;
 	
-	public Task get(String url) throws CoreException;
+	public Task get(String url) throws StoreException;
 	
-	public Integer isFetch(String url) throws CoreException; 
+	public Integer isFetch(String url) throws StoreException; 
 	
-	public Task getTop() throws CoreException;
+	public Task getTop() throws StoreException;
 	
-	public Integer getCount() throws CoreException;
+	public Integer getCount() throws StoreException;
 	
-	public Integer getRetryCount(String url) throws CoreException;
+	public Integer getRetryCount(String url) throws StoreException;
 	
-	public Task getDownloadWithOne() throws CoreException;
+	public Task getDownloadWithOne() throws StoreException;
 	
-	public void update(Task task) throws CoreException;
+	public Integer update(Task task) throws StoreException;
 	
-	public void delete(String url) throws CoreException;
+	public Integer delete(String url) throws StoreException;
 	
-	public void deleteByCrawler(String crawlerId) throws CoreException;
+	public Integer deleteByCrawler(String crawlerId) throws StoreException;
 	
-	public void deleteAll() throws CoreException;
+	public Integer deleteAll() throws StoreException;
 	
 }

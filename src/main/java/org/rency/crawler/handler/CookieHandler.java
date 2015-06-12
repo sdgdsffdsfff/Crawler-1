@@ -18,16 +18,17 @@ public class CookieHandler{
 	/**
 	 * @desc 保存Cookie
 	 * @date 2014年12月19日 下午2:48:52
-	 * @param uri
+	 * @param host
 	 * @param cookieParam
 	 * @param cookies
 	 * @throws CoreException
 	 */
-	public static void setCookies(String uri,Cookies cookies,List<Cookie> cookiess) throws CoreException{
+	public static void setCookies(String host,Cookies cookies,List<Cookie> cookiess) throws CoreException{
 		CookiesService cookiesService = SpringContextHolder.getBean(CookiesService.class);
-		if(StringUtils.isNotBlank(uri.trim()) || cookiess.size() != 0){
+		if(StringUtils.isNotBlank(host.trim()) || cookiess.size() != 0){
 			for(Cookie cookie : cookiess){
 				cookies = new Cookies();
+				cookies.setHost(host);
 				cookies.setDomian(cookie.getDomain());
 				cookies.setPath(cookie.getPath());
 				cookies.setVersion(cookie.getVersion());

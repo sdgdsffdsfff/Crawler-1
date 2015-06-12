@@ -13,6 +13,7 @@ public class Cookies implements Serializable{
 	 */
 	private static final long serialVersionUID = -2116620442965932043L;
 
+	private String host;
 	private String domian;
 	private String cookieName;
 	private String cookieValue;
@@ -25,13 +26,22 @@ public class Cookies implements Serializable{
 		this.execDate = new Date();
 	}
 	
-	public Cookies(String domian,String cookieName,String cookieValue,boolean isSecure,int version,String path){
+	public Cookies(String host,String domian,String cookieName,String cookieValue,boolean isSecure,int version,String path){
+		this.host = host;
 		this.domian = domian;
 		this.cookieName = cookieName;
 		this.cookieValue = cookieValue;
 		this.isSecure = isSecure;
 		this.version = version;
 		this.path = path;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
 	}
 
 	public String getDomian() {

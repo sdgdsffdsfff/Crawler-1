@@ -29,6 +29,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.rency.common.utils.exception.CoreException;
 import org.rency.common.utils.exception.NotModifiedException;
+import org.rency.common.utils.tool.ConvertUtils;
 import org.rency.common.utils.tool.HttpUtils;
 import org.rency.crawler.beans.Cookies;
 import org.rency.crawler.beans.Task;
@@ -160,7 +161,7 @@ public class HttpManager {
 	private CloseableHttpResponse post(Task task) throws Exception{
 		try{
 			logger.debug("executing url["+task.getUrl()+"] start. and post param is:"+task.getParams());
-			Map<String, String> postMap = HttpUtils.String2Map(task.getParams());
+			Map<String, String> postMap = ConvertUtils.String2Map(task.getParams());
 			List<NameValuePair> postParams = new ArrayList<NameValuePair>();
 			for(String key : postMap.keySet()){
 				postParams.add(new BasicNameValuePair(key, postMap.get(key)));

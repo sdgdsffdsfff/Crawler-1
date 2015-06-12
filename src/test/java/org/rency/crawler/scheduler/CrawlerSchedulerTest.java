@@ -3,13 +3,13 @@ package org.rency.crawler.scheduler;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.rency.common.utils.exception.CoreException;
+import org.rency.common.utils.exception.StoreException;
 import org.rency.crawler.service.CookiesService;
 import org.rency.crawler.service.PagesService;
 import org.rency.crawler.service.TaskService;
@@ -27,7 +27,7 @@ public class CrawlerSchedulerTest {
 	private SequenceRepository sequenceRepository;
 	
 	@Before
-	public void before() throws SQLException{
+	public void before() throws StoreException{
 		@SuppressWarnings("resource")
 		ApplicationContext ctx = new FileSystemXmlApplicationContext("src/test/resources/applicationContext.xml");
 		cookiesService = ctx.getBean(CookiesService.class);

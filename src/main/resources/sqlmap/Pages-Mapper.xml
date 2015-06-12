@@ -17,8 +17,8 @@
 	</select>
 	
 	<insert id="save" parameterType="Pages">
-		insert into t_crawler_pages (url, html, sign, charset, title, keywords, description, isCreateIndex,execDate)
-		values (#{url},#{html},#{sign},#{charset},#{title},#{keywords},#{description},#{isCreateIndex},#{execDate});
+		insert into t_crawler_pages (url, html, content, sign, charset, title, keywords, description, isCreateIndex,execDate)
+		values (#{url},#{html},#{content},#{sign},#{charset},#{title},#{keywords},#{description},#{isCreateIndex},#{execDate});
 	</insert>
 	
 	<update id="update" parameterType="Pages">
@@ -26,6 +26,9 @@
 		
 		<if test="html != null || html != ''">
 			html=#{html},
+		</if>
+		<if test="content != null || content != ''">
+			content=#{content},
 		</if>
 		<if test="charset != null || charset != ''">
 			charset=#{charset},

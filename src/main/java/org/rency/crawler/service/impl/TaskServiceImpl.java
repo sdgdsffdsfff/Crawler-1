@@ -1,6 +1,6 @@
 package org.rency.crawler.service.impl;
 
-import org.rency.common.utils.exception.CoreException;
+import org.rency.common.utils.exception.StoreException;
 import org.rency.crawler.beans.Task;
 import org.rency.crawler.repository.TaskRepository;
 import org.rency.crawler.service.TaskService;
@@ -16,64 +16,61 @@ public class TaskServiceImpl implements TaskService {
 	private TaskRepository taskRepository;
 
 	@Override
-	public void save(Task task) throws CoreException {
+	public boolean save(Task task) throws StoreException {
 		Task t = get(task.getUrl());
 		if(t == null){
-			taskRepository.save(task);
+			return taskRepository.save(task) > 0;
 		}
+		return false;
 	}
 
 	@Override
-	public Task get(String url) throws CoreException {
+	public Task get(String url) throws StoreException {
 		return taskRepository.get(url);
 	}
 	
 	@Override
-	public boolean isFetch(String url) throws CoreException{
-		int count = taskRepository.isFetch(url);
-		if(count > 0){
-			return false;
-		}
-		return true;
+	public boolean isFetch(String url) throws StoreException{
+		return taskRepository.isFetch(url) > 0;
 	}
 
 	@Override
-	public Task getTop() throws CoreException {
+	public Task getTop() throws StoreException {
 		return taskRepository.getTop();
 	}
 
 	@Override
-	public Integer getCount() throws CoreException {
+	public Integer getCount() throws StoreException {
 		return taskRepository.getCount();
 	}
 
 	@Override
-	public Integer getRetryCount(String url) throws CoreException {
+	public Integer getRetryCount(String url) throws StoreException {
 		return taskRepository.getRetryCount(url);
 	}
 
 	@Override
-	public Task getDownloadWithOne() throws CoreException {
+	public Task getDownloadWithOne() throws StoreException {
 		return taskRepository.getDownloadWithOne();
 	}
 
 	@Override
-	public void update(Task task) throws CoreException {
-		taskRepository.update(task);
+	public boolean update(Task task) throws StoreException {
+		return taskRepository.update(task) > 0;
 	}
 
 	@Override
-	public void delete(String url) throws CoreException {
-		taskRepository.delete(url);
+	public boolean delete(String url) throws StoreException {
+		return taskRepository.delete(url) > 0;
 	}
 
 	@Override
-	public void deleteByCrawler(String crawlerId) throws CoreException {
-		taskRepository.deleteByCrawler(crawlerId);
+	public boolean deleteByCrawler(String crawlerId) throws StoreException {
+		return taskRepository.deleteByCrawler(crawlerId) > 0;
 	}
 
 	@Override
-	public void deleteAll() throws CoreException {
-		taskRepository.deleteAll();
+	public boolean deleteAll() throws StoreException {
+		return taskRepository.deleteAll() > 0;
 	}
 }

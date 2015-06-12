@@ -2,23 +2,23 @@ package org.rency.crawler.repository;
 
 import java.util.List;
 
-import org.rency.common.utils.exception.CoreException;
+import org.rency.common.utils.exception.StoreException;
 import org.rency.crawler.beans.Cookies;
 import org.springframework.stereotype.Repository;
 
 @Repository("cookiesRepository")
 public interface CookiesRepository {
 
-	public List<Cookies> list() throws CoreException;
+	public List<Cookies> list() throws StoreException;
 	
-	public Cookies get(String domian) throws CoreException;
+	public Cookies get(String host) throws StoreException;
 	
-	public boolean save(Cookies cookie) throws CoreException;
+	public Integer save(Cookies cookie) throws StoreException;
 	
-	public boolean update(Cookies cookie) throws CoreException;
+	public Integer update(Cookies cookie) throws StoreException;
 	
-	public boolean delete(String domian) throws CoreException;
+	public Integer delete(String host) throws StoreException;
 	
-	public boolean deleteAll() throws CoreException;
+	public Integer deleteAll() throws StoreException;
 	
 }

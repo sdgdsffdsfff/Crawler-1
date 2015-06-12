@@ -9,16 +9,19 @@
 	</select>
 	
 	<select id="get" parameterType="String" resultType="Cookies">
-		select * from t_crawler_cookies where domian=#{domian}
+		select * from t_crawler_cookies where host=#{host}
 	</select>
 
 	<insert id="save" parameterType="Cookies">
-		insert into t_crawler_cookies (domian, cookieName, cookieValue, isSecure, version, path, execDate)
-		values (#{domian},#{cookieName},#{cookieValue},#{isSecure},#{version},#{path},#{execDate});
+		insert into t_crawler_cookies (host, domian, cookieName, cookieValue, isSecure, version, path, execDate)
+		values (#{host},#{domian},#{cookieName},#{cookieValue},#{isSecure},#{version},#{path},#{execDate});
 	</insert>
 	
 	<update id="update">
 		update t_crawler_cookies set 
+		<if test="domian != null || domian != ''">
+			domian = #{domian},
+		</if>
 		<if test="cookieName != null || cookieName != ''">
 			cookieName = #{cookieName},
 		</if>
@@ -35,13 +38,13 @@
 			path = #{path},
 		</if>
 		<if test="execDate != null">
-			path = #{execDate},
+			execDate = #{execDate},
 		</if>
-		where domian = #{domian}
+		where host = #{host}
 	</update>
 	
 	<delete id="delete" parameterType="String">
-		delete from t_crawler_cookies where domian=#{domian}
+		delete from t_crawler_cookies where host=#{host}
 	</delete>
 	
 	<delete id="deleteAll">
