@@ -16,6 +16,7 @@ import org.rency.crawler.beans.Cookies;
 import org.rency.crawler.beans.Task;
 import org.rency.crawler.service.TaskService;
 import org.rency.crawler.utils.ConvertUtils;
+import org.rency.crawler.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -41,7 +42,7 @@ public class FetchHanler{
 		taskExecutor = (ThreadPoolTaskExecutor) SpringContextHolder.getBean("crawlerTaskExecutor");
 	}
 	
-	public void taskHandler(Task task){
+	public void handler(Task task){
 		if(task == null){
 			return;
 		}
@@ -64,7 +65,7 @@ public class FetchHanler{
 	private void parse(Task task) throws Exception{
 		try{
 			//判断URL是否已访问过
-			if(!taskService.isFetch(task.getUrl())){
+			if(taskService.isFetch(task.getUrl())){
 				return ;
 			}
 			
@@ -77,21 +78,21 @@ public class FetchHanler{
 			}
 			
 			//HttpClient组件请求Http
-			HttpManager httpManager= SpringContextHolder.getBean(HttpManager.class);
-			CloseableHttpResponse response = httpManager.execute(task,cookies);
+			HttpHandler httpHandler= SpringContextHolder.getBean(HttpHandler.class);
+			CloseableHttpResponse response = httpHandler.execute(task,cookies);
 			if(response == null){
 				return;
 			}
 			//获取页面
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity);
-			httpManager.closeResources(response);
+			httpHandler.closeResources(response);
 			Document doc = Jsoup.parse(html);
-			String uri = StringUtils.isBlank(task.getHost()) ? doc.baseUri() : task.getHost();
+			String uri = StringUtils.isBlank(task.getHost()) ? UrlUtils.getHost(doc.baseUri()) : task.getHost();
 			
 			//保存cookie
 			if(cookies ==null){
-				CookieHandler.setCookies(uri,cookies,httpManager.getCookieStore().getCookies());
+				CookieHandler.setCookies(uri,cookies,httpHandler.getCookieStore().getCookies());
 			}
 			
 			/**
@@ -111,7 +112,7 @@ public class FetchHanler{
 			
 			//更新队列任务状态
 			task.setHost(uri);
-			task.setStatusCode(httpManager.getStatusCode());
+			task.setStatusCode(httpHandler.getStatusCode());
 			taskService.update(task);
 			
 			/**

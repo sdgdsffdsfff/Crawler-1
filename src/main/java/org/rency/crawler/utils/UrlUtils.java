@@ -29,18 +29,21 @@ public class UrlUtils {
 		if(StringUtils.isBlank(host)){
 			host = UrlUtils.getHost(href);
 		}
+		if(!host.endsWith("/")){
+			host = host + "/";
+		}
+		if(href.startsWith("//") || href.startsWith("/")){
+			href = href.substring(1);
+		}
 		if(href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("#") || href.startsWith(host+"#")){
 			return "";
-		}
-		if(href.startsWith("//")){
-			href = href.substring(1);
 		}
 		Matcher matcher = Pattern.compile("((https|http|ftp|rtsp|mms)?://)").matcher(href);
 		if(!matcher.find()){
 			href = href.indexOf(host) != -1 ? href:host + href;
 		}
-		if(href.startsWith("/")){
-			href = href.indexOf(host) != -1 ? href:host + href;
+		if(href.endsWith("/")){
+			href = href.substring(0,href.length() - 1);
 		}
 		return href;
 	}
@@ -52,7 +55,10 @@ public class UrlUtils {
 	 */
 	public static String getHost(String url){
 		try {
-			return StringUtils.isBlank(url) ? "":new URL(url).getHost();
+			URL uri = new URL(url);
+			String protocol = uri.getProtocol()+"://";
+			String host = StringUtils.isBlank(url) ? "":uri.getHost()+(StringUtils.isNotBlank(uri.getFile()) ? uri.getFile() : "");
+			return host.startsWith(protocol) ? host : protocol+host;
 		} catch (MalformedURLException e) {
 			logger.warn("无法获取其域名{}",url,e.getMessage());
 			return "";

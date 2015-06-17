@@ -66,7 +66,7 @@ public class CrawlerSchedulerTest {
 	
 	@Test
 	public void testStart() throws CoreException{
-		crawlerScheduler.start("http://www.taobao.com/");
+		crawlerScheduler.start("http://www.iteye.com/");
 	}
 
 	private Map<String, String> readCreateSQL(){

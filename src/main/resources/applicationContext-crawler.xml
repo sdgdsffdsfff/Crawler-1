@@ -100,6 +100,6 @@
         </property>  
     </bean>
     
-    <bean id="httpManager" class="org.rency.crawler.handler.HttpManager" />
+    <bean id="httpHandler" class="org.rency.crawler.handler.HttpHandler" />
 	
 </beans>

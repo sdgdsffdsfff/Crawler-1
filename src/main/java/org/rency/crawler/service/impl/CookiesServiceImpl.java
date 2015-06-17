@@ -29,7 +29,11 @@ public class CookiesServiceImpl implements CookiesService {
 
 	@Override
 	public boolean add(Cookies cookies) throws StoreException {
-		return cookiesRepository.save(cookies) > 0;
+		Cookies c = query(cookies.getHost());
+		if(c == null){
+			return cookiesRepository.save(cookies) > 0;
+		}
+		return true;
 	}
 
 	@Override

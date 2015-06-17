@@ -19,6 +19,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.cookie.ClientCookie;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
@@ -37,9 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 
-public class HttpManager {
+public class HttpHandler {
 	
-	private static final Logger logger = LoggerFactory.getLogger(HttpManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 	
 	private final int timeout = 5000;
 	private final int maxTotal = 100;
@@ -56,7 +57,7 @@ public class HttpManager {
     
     private int statusCode;
     
-    public HttpManager(){
+    public HttpHandler(){
     	if(cookieStore == null){
     		cookieStore = new BasicCookieStore();
     	}
@@ -124,6 +125,9 @@ public class HttpManager {
 			}else{
 				return null;
 			}
+		}catch (ConnectionPoolTimeoutException e) {
+			logger.warn("connection["+task.getUrl()+"] error.",e);
+			throw new SocketTimeoutException(e.toString());
 		}catch(NotModifiedException e){
 			logger.debug("connection["+task.getUrl()+"] error.",e);
 			return null;
@@ -289,12 +293,9 @@ public class HttpManager {
 				}; 
 				cookieStore.addCookie(cookie);
 				context.setCookieStore(cookieStore);
-			}
-			
+			}			
 		}catch(Exception e){
-			logger.error("setCookie["+cookies+"] error.",e);
-			e.printStackTrace();
-			throw new CoreException(e);
+			logger.warn("setCookie["+cookies+"] error.",e);
 		}
 	}
 	

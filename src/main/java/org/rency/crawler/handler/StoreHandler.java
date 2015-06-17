@@ -9,6 +9,7 @@ import org.rency.crawler.service.TaskService;
 import org.rency.crawler.utils.CrawlerDict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
 
 /**
  * 存储
@@ -75,16 +76,21 @@ public class StoreHandler{
 	 */
 	private void save(Pages pages) throws StoreException{
 		try{
-			pagesService.save(pages);
-			logger.debug("save page["+pages.getUrl()+"]");
-			
-			//更新队列任务状态为已下载
-			Task task = new Task();
-			task.setUrl(pages.getUrl());
-			task.setDownload(true);
-			taskService.update(task);
-		}catch (Exception e) {
-			logger.error("saver page["+pages.getUrl()+"] error.",e);
+			if(pagesService.save(pages)){
+				logger.debug("save page[{}] success",pages.getUrl());
+				//更新队列任务状态为已下载
+				Task task = new Task();
+				task.setUrl(pages.getUrl());
+				task.setDownload(true);
+				taskService.update(task);
+			}else{
+				logger.warn("save page[{}] failed, and again.",pages.getUrl());
+				store(pages);
+			}
+		}catch(DuplicateKeyException e){
+			logger.debug("save page[{}] failed, and exists.",pages.getUrl());
+		}catch(Exception e) {
+			logger.error("saver page[{}] error.",pages.getUrl(),e);
 			throw new StoreException(e);
 		}
 	}

@@ -39,7 +39,7 @@ public class URLHandler {
 				}
 				Task task = new Task();
 				task.setUrl(url);
-				task.setHost(host);
+				task.setHost(UrlUtils.getHost(url));
 				task.setHttpMethod(HttpMethod.GET);
 				commitTask(task);
 			}

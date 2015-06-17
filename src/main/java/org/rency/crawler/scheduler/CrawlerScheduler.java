@@ -9,6 +9,7 @@ import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Task;
 import org.rency.crawler.handler.TaskHandler;
 import org.rency.crawler.service.TaskService;
+import org.rency.crawler.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class CrawlerScheduler {
 			conn.connect();
 			Task task = new Task();
 			task.setUrl(netAddr);
-			task.setHost(conn.getURL().getHost());
+			task.setHost(UrlUtils.getHost(netAddr));
 			task.setDownload(false);
 			task.setHttpMethod(HttpMethod.GET);
 			taskService.save(task);

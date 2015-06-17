@@ -37,7 +37,11 @@ public class PagesServiceImpl implements PagesService{
 
 	@Override
 	public boolean save(Pages page) throws StoreException {
-		return pagesRepository.save(page) > 0;
+		Pages p = get(page.getUrl(),page.getSign());
+		if(p == null){
+			return pagesRepository.save(page) > 0;
+		}
+		return true;
 	}
 
 	@Override
