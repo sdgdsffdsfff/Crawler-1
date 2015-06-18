@@ -2,6 +2,7 @@ package org.rency.crawler.handler;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.nodes.Document;
@@ -44,8 +45,7 @@ public class URLHandler {
 				commitTask(task);
 			}
 		}catch(Exception e){
-			logger.error("解析页面提取Href时异常."+doc.html(),e);
-			e.printStackTrace();
+			logger.error("解析页面提取Href时异常."+doc.html());
 			throw new CoreException(e);
 		}
 	}
@@ -122,10 +122,14 @@ public class URLHandler {
 			TaskService taskService = SpringContextHolder.getBean(TaskService.class);
 			if(taskService.save(task)){
 				logger.debug("add new task["+task.toString()+"] ");
-				taskExecutor.execute(new TaskHandler(task));
+				try{
+					taskExecutor.execute(new TaskHandler(task));
+				}catch(RejectedExecutionException e){
+					logger.warn("提交新任务时线程池拒绝[{}]",task.toString(),e);
+				}
 			}			
 		}catch(Exception e){
-			logger.error("提交新任务异常.task:"+task.toString(),e);
+			logger.error("提交新任务异常.task:"+task.toString());
 			throw new CoreException(e);
 		}
 	}

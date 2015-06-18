@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.NoHttpResponseException;
@@ -32,8 +33,10 @@ import org.rency.common.utils.exception.CoreException;
 import org.rency.common.utils.exception.NotModifiedException;
 import org.rency.common.utils.tool.ConvertUtils;
 import org.rency.common.utils.tool.HttpUtils;
+import org.rency.common.utils.tool.XmlUtils;
 import org.rency.crawler.beans.Cookies;
 import org.rency.crawler.beans.Task;
+import org.rency.crawler.utils.CrawlerDict;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -41,6 +44,8 @@ import org.springframework.http.HttpMethod;
 public class HttpHandler {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
+	
+	private String userAgentXmlPath;
 	
 	private final int timeout = 5000;
 	private final int maxTotal = 100;
@@ -117,6 +122,7 @@ public class HttpHandler {
 			HttpGet httpget = new HttpGet(task.getUrl());
 			logger.debug("executing url["+task.getUrl()+"] start.");
 	        httpget.setConfig(requestConfig);
+	        httpget.setHeader(CrawlerDict.USER_AGENT, getUserAgent());
 			CloseableHttpResponse response = httpClient.execute(httpget, context);
 			statusCode = response.getStatusLine().getStatusCode();
 			logger.debug("execute url["+task.getUrl()+"] finish. Status Code:"+statusCode);
@@ -323,5 +329,22 @@ public class HttpHandler {
 
 	public int getStatusCode() {
 		return statusCode;
+	}
+	
+	private String getUserAgent() throws CoreException{
+		Map<String, String> agents = XmlUtils.getNodes(userAgentXmlPath, "agent",true);
+		if(agents == null){
+			return "Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0";
+		}
+		int agentCount = agents.size();
+		String key = "agent"+new Random().nextInt(agentCount);
+		if(!agents.containsKey(key)){
+			key = "agent"+new Random(agentCount);
+		}
+		return agents.get(key);
+	}
+
+	public void setUserAgentXmlPath(String userAgentXmlPath) {
+		this.userAgentXmlPath = userAgentXmlPath;
 	}
 }

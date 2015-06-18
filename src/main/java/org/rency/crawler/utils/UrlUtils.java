@@ -57,7 +57,7 @@ public class UrlUtils {
 		try {
 			URL uri = new URL(url);
 			String protocol = uri.getProtocol()+"://";
-			String host = StringUtils.isBlank(url) ? "":uri.getHost()+(StringUtils.isNotBlank(uri.getFile()) ? uri.getFile() : "");
+			String host = StringUtils.isBlank(url) ? "":uri.getHost();
 			return host.startsWith(protocol) ? host : protocol+host;
 		} catch (MalformedURLException e) {
 			logger.warn("无法获取其域名{}",url,e.getMessage());

@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rency.common.utils.exception.CoreException;
 import org.rency.common.utils.exception.StoreException;
+import org.rency.crawler.beans.Configuration;
 import org.rency.crawler.service.CookiesService;
 import org.rency.crawler.service.PagesService;
 import org.rency.crawler.service.TaskService;
@@ -66,7 +67,9 @@ public class CrawlerSchedulerTest {
 	
 	@Test
 	public void testStart() throws CoreException{
-		crawlerScheduler.start("http://www.iteye.com/");
+		Configuration cfg = new Configuration();
+		cfg.setStartAddr("http://www.itzhai.com/");
+		crawlerScheduler.start(cfg);
 	}
 
 	private Map<String, String> readCreateSQL(){

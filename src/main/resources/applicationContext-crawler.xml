@@ -100,6 +100,8 @@
         </property>  
     </bean>
     
-    <bean id="httpHandler" class="org.rency.crawler.handler.HttpHandler" />
+    <bean id="httpHandler" class="org.rency.crawler.handler.HttpHandler">
+    	<property name="userAgentXmlPath" value="${http.userAgentXmlPath}" />
+    </bean>
 	
 </beans>

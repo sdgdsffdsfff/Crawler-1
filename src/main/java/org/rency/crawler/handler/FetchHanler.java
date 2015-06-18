@@ -19,6 +19,7 @@ import org.rency.crawler.utils.ConvertUtils;
 import org.rency.crawler.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -91,7 +92,7 @@ public class FetchHanler{
 			String uri = StringUtils.isBlank(task.getHost()) ? UrlUtils.getHost(doc.baseUri()) : task.getHost();
 			
 			//保存cookie
-			if(cookies ==null){
+			if(cookies ==null && task.getHttpMethod() == HttpMethod.POST){
 				CookieHandler.setCookies(uri,cookies,httpHandler.getCookieStore().getCookies());
 			}
 			

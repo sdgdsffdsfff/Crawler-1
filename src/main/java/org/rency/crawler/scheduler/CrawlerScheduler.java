@@ -4,12 +4,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import org.rency.common.utils.enums.Errors;
+import org.rency.common.utils.enums.ErrorKind;
 import org.rency.common.utils.exception.CoreException;
+import org.rency.common.utils.exception.ServerException;
+import org.rency.crawler.beans.Configuration;
 import org.rency.crawler.beans.Task;
 import org.rency.crawler.handler.TaskHandler;
 import org.rency.crawler.service.TaskService;
 import org.rency.crawler.utils.UrlUtils;
+import org.rency.crawler.utils.ValidateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,22 +49,23 @@ public class CrawlerScheduler {
 	* @Date: 2015年6月6日 下午1:48:37
 	* @throws CoreException
 	 */
-	public void start(String netAddr) throws CoreException{
-		logger.info("启动爬虫[{}]",netAddr);
+	public void start(Configuration cfg) throws CoreException{
+		logger.info("启动爬虫[{}]",cfg.getStartAddr());
+		ValidateUtils.validateConfiguration(cfg);
 		try{
-			URL url = new URL(netAddr);
+			URL url = new URL(cfg.getStartAddr());
 			URLConnection conn = url.openConnection();
 			conn.connect();
 			Task task = new Task();
-			task.setUrl(netAddr);
-			task.setHost(UrlUtils.getHost(netAddr));
+			task.setUrl(cfg.getStartAddr());
+			task.setHost(UrlUtils.getHost(cfg.getStartAddr()));
 			task.setDownload(false);
 			task.setHttpMethod(HttpMethod.GET);
 			taskService.save(task);
 			taskExecutor.execute(new TaskHandler(task));
 		}catch(IOException e){
-			logger.error(Errors.NET_NOTFOUND.getMessage()+"{}",netAddr,e);
-			throw new CoreException(Errors.NET_NOTFOUND);
+			logger.error("目标网络错误{}",cfg.getStartAddr(),e);
+			throw new ServerException(ErrorKind.NET_NOT_FOUND);
 		}
 		boolean isExec = true;
 		while(isExec){
