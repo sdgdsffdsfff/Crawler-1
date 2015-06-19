@@ -101,7 +101,10 @@
     </bean>
     
     <bean id="httpHandler" class="org.rency.crawler.handler.HttpHandler">
-    	<property name="userAgentXmlPath" value="${http.userAgentXmlPath}" />
+    	<property name="userAgentXmlPath" value="${crawler.http.userAgentXmlPath}" />
     </bean>
+    
+    <!-- 爬虫参数注入 -->
+    <bean class="org.rency.crawler.utils.CrawlerResources" />
 	
 </beans>

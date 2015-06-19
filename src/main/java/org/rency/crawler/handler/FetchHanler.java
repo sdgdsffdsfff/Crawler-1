@@ -91,7 +91,7 @@ public class FetchHanler{
 			Document doc = Jsoup.parse(html);
 			String uri = StringUtils.isBlank(task.getHost()) ? UrlUtils.getHost(doc.baseUri()) : task.getHost();
 			
-			//保存cookie
+			//当请求为post时保存cookie
 			if(cookies ==null && task.getHttpMethod() == HttpMethod.POST){
 				CookieHandler.setCookies(uri,cookies,httpHandler.getCookieStore().getCookies());
 			}
@@ -119,7 +119,7 @@ public class FetchHanler{
 			/**
 			 * 提交保存页面任务
 			 */
-			taskExecutor.execute(new TaskHandler(ConvertUtils.toPages(task, doc)));
+			//taskExecutor.execute(new TaskHandler(ConvertUtils.toPages(task, doc)));
 		}catch(RejectedExecutionException e){
 			logger.debug("crawler executor service force stoped...",e);
 			return;

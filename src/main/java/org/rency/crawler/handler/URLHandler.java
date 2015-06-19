@@ -44,9 +44,9 @@ public class URLHandler {
 				task.setHttpMethod(HttpMethod.GET);
 				commitTask(task);
 			}
-		}catch(Exception e){
+		}catch(CoreException e){
 			logger.error("解析页面提取Href时异常."+doc.html());
-			throw new CoreException(e);
+			throw e;
 		}
 	}
 	
@@ -126,11 +126,12 @@ public class URLHandler {
 					taskExecutor.execute(new TaskHandler(task));
 				}catch(RejectedExecutionException e){
 					logger.warn("提交新任务时线程池拒绝[{}]",task.toString(),e);
+					throw e;
 				}
 			}			
 		}catch(Exception e){
 			logger.error("提交新任务异常.task:"+task.toString());
-			throw new CoreException(e);
+			throw e;
 		}
 	}
 	

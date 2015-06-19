@@ -13,6 +13,10 @@
 		select * from t_crawler_task where url=#{url} order by execDate
 	</select>
 	
+	<select id="load" parameterType="String" resultType="Task">
+		select * from t_crawler_task where url=#{url} order by execDate for update
+	</select>
+	
 	<select id="isFetch" parameterType="String" resultType="int">
 		select count(url) from t_crawler_task where url=#{url} and statusCode=200
 	</select>

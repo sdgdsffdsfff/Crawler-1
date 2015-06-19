@@ -9,14 +9,45 @@ public interface TaskRepository {
 
 	public Integer save(Task task) throws StoreException;
 	
+	/**
+	 * 获取任务
+	 * @param url
+	 * @return
+	 * @throws StoreException
+	 */
 	public Task get(String url) throws StoreException;
 	
+	/**
+	 * 加载任务(共享锁控制)
+	 * @param url
+	 * @return
+	 * @throws StoreException
+	 */
+	public Task load(String url) throws StoreException;
+	
+	/**
+	 * 判断该URL是否已抓去过
+	 * @param url
+	 * @return
+	 * @throws StoreException
+	 */
 	public Integer isFetch(String url) throws StoreException; 
 	
+	/**
+	 * 
+	 * @return
+	 * @throws StoreException
+	 */
 	public Task getTop() throws StoreException;
 	
 	public Integer getCount() throws StoreException;
 	
+	/**
+	 * 获取该任务的重试次数
+	 * @param url
+	 * @return
+	 * @throws StoreException
+	 */
 	public Integer getRetryCount(String url) throws StoreException;
 	
 	public Task getDownloadWithOne() throws StoreException;

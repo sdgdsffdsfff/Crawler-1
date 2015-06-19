@@ -60,7 +60,7 @@ public class RetryHandler {
 				}
 			}
 			taskService.update(task);
-			logger.debug("fetch target address {},timeout {}",task.toString(),retryCount);
+			logger.debug("fetch target address {},retryCount {}",task.toString(),retryCount);
 		} catch (CoreException e) {
 			logger.error("fetch task {} timeout error.",task.toString(),e);
 		}

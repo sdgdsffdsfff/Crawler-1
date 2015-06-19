@@ -16,7 +16,6 @@ public class ValidateUtils {
 	public static void validateConfiguration(Configuration cfg){
 		logger.info("准备校验启动爬虫参数");
 		Assert.notNull(cfg.getStartAddr(),"爬虫抓取地址不能为空");
-		Assert.isTrue(cfg.getDepth() > 0,"爬虫抓取深度不能为零");
 		logger.info("校验启动爬虫参数完毕");
 	}
 }

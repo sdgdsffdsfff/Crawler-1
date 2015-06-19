@@ -11,12 +11,7 @@ public class Configuration implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 4805885341933940811L;
-	
-	/**
-	 * 爬虫抓取深度
-	 */
-	private int depth = 2;
-	
+		
 	/**
 	 * 抓取起始地址
 	 */
@@ -26,14 +21,6 @@ public class Configuration implements Serializable {
 	
 	public Configuration(String startAddr){
 		this.startAddr = startAddr;
-	}
-
-	public int getDepth() {
-		return depth;
-	}
-
-	public void setDepth(int depth) {
-		this.depth = depth;
 	}
 
 	public String getStartAddr() {

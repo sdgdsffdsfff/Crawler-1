@@ -17,7 +17,7 @@ public class TaskServiceImpl implements TaskService {
 
 	@Override
 	public boolean save(Task task) throws StoreException {
-		Task t = get(task.getUrl());
+		Task t = load(task.getUrl());
 		if(t == null){
 			return taskRepository.save(task) > 0;
 		}
@@ -27,6 +27,10 @@ public class TaskServiceImpl implements TaskService {
 	@Override
 	public Task get(String url) throws StoreException {
 		return taskRepository.get(url);
+	}
+	
+	public Task load(String url) throws StoreException{
+		return taskRepository.load(url);
 	}
 	
 	@Override
