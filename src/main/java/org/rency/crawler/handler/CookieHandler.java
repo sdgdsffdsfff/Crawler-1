@@ -7,9 +7,11 @@ import org.apache.http.cookie.Cookie;
 import org.rency.common.utils.domain.SpringContextHolder;
 import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Cookies;
+import org.rency.crawler.beans.Task;
 import org.rency.crawler.service.CookiesService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 
 public class CookieHandler{
 	
@@ -18,41 +20,43 @@ public class CookieHandler{
 	/**
 	 * @desc 保存Cookie
 	 * @date 2014年12月19日 下午2:48:52
-	 * @param host
-	 * @param cookieParam
+	 * @param task
 	 * @param cookies
 	 * @throws CoreException
 	 */
-	public static void setCookies(String host,Cookies cookies,List<Cookie> cookiess) throws CoreException{
+	public static void setCookies(Task task,List<Cookie> cookiess) throws CoreException{
+		if(task.getHttpMethod() != HttpMethod.POST || StringUtils.isBlank(task.getHost()) || cookiess.size() == 0){
+			return;
+		}
 		CookiesService cookiesService = SpringContextHolder.getBean(CookiesService.class);
-		if(StringUtils.isNotBlank(host.trim()) || cookiess.size() != 0){
-			for(Cookie cookie : cookiess){
-				cookies = new Cookies();
-				cookies.setHost(host);
-				cookies.setDomian(cookie.getDomain());
-				cookies.setPath(cookie.getPath());
-				cookies.setVersion(cookie.getVersion());
-				cookies.setSecure(cookie.isSecure());
-				cookies.setCookieName(cookie.getName());
-				cookies.setCookieValue(cookie.getValue());
-				cookies.setPath(cookie.getPath());
-				boolean isSave = cookiesService.add(cookies);
-				logger.debug("save cookie["+cookies.toString()+"] result:"+isSave);
-			}
+		for(Cookie cookie : cookiess){
+			Cookies cookies = new Cookies();
+			cookies.setHost(task.getHost());
+			cookies.setDomian(cookie.getDomain());
+			cookies.setPath(cookie.getPath());
+			cookies.setVersion(cookie.getVersion());
+			cookies.setSecure(cookie.isSecure());
+			cookies.setCookieName(cookie.getName());
+			cookies.setCookieValue(cookie.getValue());
+			cookies.setPath(cookie.getPath());
+			boolean isSave = cookiesService.add(cookies);
+			logger.debug("save cookie[{}] result[{}]",cookies.toString(),isSave);
 		}
 	}
 	
 	/**
 	 * 获取Cookies
-	 * @param host
+	 * @param task
 	 * @return
 	 * @throws CoreException
 	 */
-	public static Cookies getCookie(String host) throws CoreException{
-		CookiesService cookiesService = SpringContextHolder.getBean(CookiesService.class);
-		Cookies cookies = cookiesService.query(host);
-		logger.debug("get cookie {},host {}",cookies,host);
-		return cookies;
+	public static Cookies getCookie(Task task) throws CoreException{
+		if(task.getHttpMethod() == HttpMethod.POST && StringUtils.isNotBlank(task.getHost())){
+			Cookies cookies = SpringContextHolder.getBean(CookiesService.class).query(task.getHost());
+			logger.debug("get cookie {},host {}",cookies,task.getHost());
+			return cookies;
+		}
+		return null;		
 	}
 	
 }

@@ -11,50 +11,38 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.rency.common.utils.domain.SpringContextHolder;
-import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Cookies;
 import org.rency.crawler.beans.Task;
 import org.rency.crawler.service.TaskService;
-import org.rency.crawler.utils.ConvertUtils;
 import org.rency.crawler.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
- * 抓取
+ * 抓取处理
 * @ClassName: FetchHanler 
-* @Description: TODO
 * @Author user_rcy@163.com
 * @Date 2015年6月6日 下午1:31:43 
 *
  */
-public class FetchHanler{
+public class FetchHandler{
 	
 	private TaskService taskService;
 	
-	private ThreadPoolTaskExecutor taskExecutor;
+	private static final Logger logger = LoggerFactory.getLogger(FetchHandler.class);
 	
-	private static final Logger logger = LoggerFactory.getLogger(FetchHanler.class);
-	
-	public FetchHanler(){
+	public FetchHandler(){
 		taskService = SpringContextHolder.getBean(TaskService.class);
-		taskExecutor = (ThreadPoolTaskExecutor) SpringContextHolder.getBean("crawlerTaskExecutor");
 	}
 	
 	public void handler(Task task){
-		if(task == null){
-			return;
-		}
-		logger.debug("执行抓取任务."+task.toString());
 		try{
 			parse(task);
 		}catch(SocketTimeoutException e){
-			RetryHandler.retryTask(task, taskService, taskExecutor);
+			RetryHandler.retryTask(task, taskService);
 		}catch(Exception e){
-			logger.error("fetch page["+task.getUrl()+"] error.",e);
-			RetryHandler.retryTask(taskService, taskExecutor);
+			logger.error("fetch page[{}] error.",task.getUrl(),e);
+			RetryHandler.retryTask(taskService);
 		}
 	}
 	
@@ -70,13 +58,8 @@ public class FetchHanler{
 				return ;
 			}
 			
-			/**
-			 * 获取已保存网站cookie
-			 */
-			Cookies cookies = null;
-			if(StringUtils.isNotBlank(task.getHost())){
-				cookies = CookieHandler.getCookie(task.getHost());
-			}
+			//获取cookie
+			Cookies cookies = CookieHandler.getCookie(task);
 			
 			//HttpClient组件请求Http
 			HttpHandler httpHandler= SpringContextHolder.getBean(HttpHandler.class);
@@ -91,10 +74,8 @@ public class FetchHanler{
 			Document doc = Jsoup.parse(html);
 			String uri = StringUtils.isBlank(task.getHost()) ? UrlUtils.getHost(doc.baseUri()) : task.getHost();
 			
-			//当请求为post时保存cookie
-			if(cookies ==null && task.getHttpMethod() == HttpMethod.POST){
-				CookieHandler.setCookies(uri,cookies,httpHandler.getCookieStore().getCookies());
-			}
+			//保存cookie
+			CookieHandler.setCookies(task,httpHandler.getCookieStore().getCookies());
 			
 			/**
 			 * 提取页面中Href超链接
@@ -121,16 +102,13 @@ public class FetchHanler{
 			 */
 			//taskExecutor.execute(new TaskHandler(ConvertUtils.toPages(task, doc)));
 		}catch(RejectedExecutionException e){
-			logger.debug("crawler executor service force stoped...",e);
 			return;
 		}catch(SocketTimeoutException e){
 			throw e;
 		}catch (UnknownHostException e) {
-			logger.debug("Unknown Host."+e+", and give up connection "+task.getUrl());
 			throw new SocketTimeoutException(e.getMessage());
 		}catch(Exception e){
-			logger.error("parse page["+task.getUrl()+"] error.",e);
-			throw new CoreException(e);
+			throw e;
 		}
 	}	
 }

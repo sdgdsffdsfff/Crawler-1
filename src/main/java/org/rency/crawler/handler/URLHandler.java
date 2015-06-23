@@ -2,25 +2,18 @@ package org.rency.crawler.handler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.commons.lang.StringUtils;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.rency.common.utils.domain.SpringContextHolder;
 import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Task;
-import org.rency.crawler.service.TaskService;
+import org.rency.crawler.scheduler.TaskScheduler;
 import org.rency.crawler.utils.UrlUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 public class URLHandler {
-	
-	private static final Logger logger = LoggerFactory.getLogger(URLHandler.class);
 	
 	/**
 	 * @desc 提取页面中的超链接
@@ -42,10 +35,9 @@ public class URLHandler {
 				task.setUrl(url);
 				task.setHost(UrlUtils.getHost(url));
 				task.setHttpMethod(HttpMethod.GET);
-				commitTask(task);
+				TaskScheduler.fetch(task);
 			}
 		}catch(CoreException e){
-			logger.error("解析页面提取Href时异常."+doc.html());
 			throw e;
 		}
 	}
@@ -78,8 +70,6 @@ public class URLHandler {
 				}
 			}
 		}catch(Exception e){
-			logger.error("解析页面表单Action时异常."+doc.html(),e);
-			e.printStackTrace();
 			throw new CoreException(e);
 		}
 	}
@@ -104,35 +94,8 @@ public class URLHandler {
 				}
 			}
 		}catch(Exception e){
-			logger.error("解析页面提取JavaScript时异常."+doc.html(),e);
-			e.printStackTrace();
 			throw new CoreException(e);
 		}
 	}
-	
-	/**
-	 * @desc 提交新的页面抓取任务
-	 * @date 2015年1月9日 下午1:57:24
-	 * @param task
-	 * @throws CoreException
-	 */
-	private static void commitTask(Task task) throws CoreException{
-		ThreadPoolTaskExecutor taskExecutor = (ThreadPoolTaskExecutor) SpringContextHolder.getBean("crawlerTaskExecutor");
-		try{
-			TaskService taskService = SpringContextHolder.getBean(TaskService.class);
-			if(taskService.save(task)){
-				logger.debug("add new task["+task.toString()+"] ");
-				try{
-					taskExecutor.execute(new TaskHandler(task));
-				}catch(RejectedExecutionException e){
-					logger.warn("提交新任务时线程池拒绝[{}]",task.toString(),e);
-					throw e;
-				}
-			}			
-		}catch(Exception e){
-			logger.error("提交新任务异常.task:"+task.toString());
-			throw e;
-		}
-	}
-	
+		
 }

@@ -5,6 +5,11 @@
 	<!-- console appender -->  
 	<appender name="CONSOLE-APPENDER" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder charset="UTF-8" />
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>debug</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
 		</layout>
@@ -14,6 +19,11 @@
 	<appender name="DEFAULT-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<encoder charset="UTF-8" />
 		<file>${logRoot}/default.log</file>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>info</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${logRoot}/default.log.%d{yyyy-MM-dd}</fileNamePattern>
 		</rollingPolicy>
@@ -26,6 +36,11 @@
 	<appender name="ERROR-APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<encoder charset="UTF-8" />
 		<file>${logRoot}/error.log</file>
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${logRoot}/error.log.%d{yyyy-MM-dd}</fileNamePattern>
 		</rollingPolicy>

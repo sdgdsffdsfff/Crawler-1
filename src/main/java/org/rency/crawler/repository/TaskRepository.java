@@ -7,6 +7,12 @@ import org.springframework.stereotype.Repository;
 @Repository("taskRepository")
 public interface TaskRepository {
 
+	/**
+	 * 保存任务
+	 * @param task
+	 * @return
+	 * @throws StoreException
+	 */
 	public Integer save(Task task) throws StoreException;
 	
 	/**
@@ -26,18 +32,13 @@ public interface TaskRepository {
 	public Task load(String url) throws StoreException;
 	
 	/**
-	 * 判断该URL是否已抓去过
+	 * 判断该URL是否已抓过
 	 * @param url
 	 * @return
 	 * @throws StoreException
 	 */
 	public Integer isFetch(String url) throws StoreException; 
 	
-	/**
-	 * 
-	 * @return
-	 * @throws StoreException
-	 */
 	public Task getTop() throws StoreException;
 	
 	public Integer getCount() throws StoreException;

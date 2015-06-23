@@ -9,16 +9,10 @@ import org.rency.common.utils.exception.CoreException;
 import org.rency.common.utils.exception.ServerException;
 import org.rency.crawler.beans.Configuration;
 import org.rency.crawler.beans.Task;
-import org.rency.crawler.handler.TaskHandler;
-import org.rency.crawler.service.TaskService;
 import org.rency.crawler.utils.UrlUtils;
 import org.rency.crawler.utils.ValidateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpMethod;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,14 +28,6 @@ public class CrawlerScheduler {
 	
 	private static final Logger logger = LoggerFactory.getLogger(CrawlerScheduler.class);
 	
-	@Autowired
-	@Qualifier("taskService")
-	private TaskService taskService;
-	
-	@Autowired
-	@Qualifier("crawlerTaskExecutor")
-	private ThreadPoolTaskExecutor taskExecutor;
-
 	/**
 	 * 启动爬虫
 	* @Title: start 
@@ -59,10 +45,7 @@ public class CrawlerScheduler {
 			Task task = new Task();
 			task.setUrl(cfg.getStartAddr());
 			task.setHost(UrlUtils.getHost(cfg.getStartAddr()));
-			task.setDownload(false);
-			task.setHttpMethod(HttpMethod.GET);
-			taskService.save(task);
-			taskExecutor.execute(new TaskHandler(task));
+			TaskScheduler.fetch(task);
 		}catch(IOException e){
 			logger.error("目标网络错误{}",cfg.getStartAddr(),e);
 			throw new ServerException(ErrorKind.NET_NOT_FOUND);
@@ -73,11 +56,10 @@ public class CrawlerScheduler {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 			}
-			int activeCount = taskExecutor.getActiveCount();
+			int activeCount = TaskScheduler.getActiveCount();
 			if(activeCount == 0){
-				taskExecutor.shutdown();
+				TaskScheduler.shutdown();
 				isExec = false;
-				System.out.println("线程池结束");
 			}
 		}
 	}

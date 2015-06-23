@@ -70,6 +70,10 @@ public class Task implements Serializable{
 	private Date execDate;
 	
 	public Task(){
+		this.isDownload = false;
+		this.statusCode = 0;
+		this.retryCount = 0;
+		this.httpMethod = HttpMethod.GET;
 		this.execDate = new Date();
 	}
 

@@ -18,11 +18,11 @@
 	</select>
 	
 	<select id="isFetch" parameterType="String" resultType="int">
-		select count(url) from t_crawler_task where url=#{url} and statusCode=200
+		select count(url) from t_crawler_task where url=#{url} and statusCode=200 and isDownload=false
 	</select>
 	
 	<select id="getTop" resultType="Task">
-		select * from t_crawler_task where retryCount = 5 order by execDate
+		select * from t_crawler_task where statusCode != 200 and isDownload=false order by execDate limit 1
 	</select>
 	
 	<select id="getCount" resultType="int">

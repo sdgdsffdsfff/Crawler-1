@@ -84,13 +84,11 @@ public class StoreHandler{
 				task.setDownload(true);
 				taskService.update(task);
 			}else{
-				logger.warn("save page[{}] failed, and again.",pages.getUrl());
-				store(pages);
+				throw new StoreException();
 			}
 		}catch(DuplicateKeyException e){
-			logger.debug("save page[{}] failed, and exists.",pages.getUrl());
+			logger.warn("save page[{}] failed, and exists.",pages.getUrl());
 		}catch(Exception e) {
-			logger.error("saver page[{}] error.",pages.getUrl(),e);
 			throw new StoreException(e);
 		}
 	}

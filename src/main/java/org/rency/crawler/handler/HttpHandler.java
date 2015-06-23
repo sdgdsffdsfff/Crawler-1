@@ -104,8 +104,6 @@ public class HttpHandler {
 				return post(task);
 			}
 		}catch(Exception e){
-			logger.error("executing get request url["+task.getUrl()+"].",e);
-			e.printStackTrace();
 			throw new CoreException(e);
 		}
     }
@@ -120,43 +118,35 @@ public class HttpHandler {
 	private CloseableHttpResponse get(Task task) throws Exception{
 		try{
 			HttpGet httpget = new HttpGet(task.getUrl());
-			logger.debug("executing url["+task.getUrl()+"] start.");
+			logger.debug("executing url[{}] start.",task.getUrl());
 	        httpget.setConfig(requestConfig);
 	        httpget.setHeader(CrawlerDict.USER_AGENT, getUserAgent());
 			CloseableHttpResponse response = httpClient.execute(httpget, context);
 			statusCode = response.getStatusLine().getStatusCode();
-			logger.debug("execute url["+task.getUrl()+"] finish. Status Code:"+statusCode);
+			logger.debug("execute url[{}] finish, and status code[{}]",task.getUrl(),statusCode);
 			if(HttpUtils.httpResponseStatus(statusCode)){
 				return response;
 			}else{
 				return null;
 			}
 		}catch (ConnectionPoolTimeoutException e) {
-			logger.warn("connection["+task.getUrl()+"] error.",e);
 			throw new SocketTimeoutException(e.toString());
 		}catch(NotModifiedException e){
-			logger.debug("connection["+task.getUrl()+"] error.",e);
 			return null;
 		}catch (UnknownHostException e) {
-			logger.debug("connection["+task.getUrl()+"] error.",e);
 			throw new SocketTimeoutException(e.toString());
 		}catch (NoHttpResponseException e) {
-			logger.debug("connection["+task.getUrl()+"] error.",e);
-			throw e;
+			throw new SocketTimeoutException(e.toString());
 		}catch(SocketTimeoutException e){
-			logger.debug("connection["+task.getUrl()+"] error.",e);
 			throw e;
 		}catch(RuntimeException e){
-			logger.debug("connection["+task.getUrl()+"] error.",e);
+			logger.error("execute target[{}] unknow exception.",task.getUrl(),e);
 			return null;
 		}catch(ClientProtocolException e){
-			logger.error("executing get request url["+task.getUrl()+"].",e);
 			throw new SocketTimeoutException(e.getMessage());
 		}catch(IOException e){
-			logger.error("executing get request url["+task.getUrl()+"].",e);
 			throw new CoreException(e);
 		}catch(Exception e){
-			logger.error("executing get request url["+task.getUrl()+"].",e);
 			throw new CoreException(e);
 		}
 	}
@@ -170,7 +160,7 @@ public class HttpHandler {
 	 */
 	private CloseableHttpResponse post(Task task) throws Exception{
 		try{
-			logger.debug("executing url["+task.getUrl()+"] start. and post param is:"+task.getParams());
+			logger.debug("executing url[{}] start, and post param is[{}].",task.getUrl(),task.getParams());
 			Map<String, String> postMap = ConvertUtils.String2Map(task.getParams());
 			List<NameValuePair> postParams = new ArrayList<NameValuePair>();
 			for(String key : postMap.keySet()){
@@ -182,35 +172,30 @@ public class HttpHandler {
 			post.setConfig(requestConfig);
 			CloseableHttpResponse response = httpClient.execute(post, context);
 			statusCode = response.getStatusLine().getStatusCode();
-			logger.debug("execute url["+task.getUrl()+"] succ. Status Code:"+statusCode);
+			logger.debug("execute url[{}] finish, and status code[{}]",task.getUrl(),statusCode);
 			if(HttpUtils.httpResponseStatus(statusCode)){
 				return response;
 			}else{
 				return null;
 			}
+		}catch (ConnectionPoolTimeoutException e) {
+			throw new SocketTimeoutException(e.toString());
 		}catch(NotModifiedException e){
-			logger.debug("connection["+task.getUrl()+"] error.",e);
 			return null;
 		}catch (UnknownHostException e) {
-			logger.debug("connection["+task.getUrl()+"] error.",e);
 			throw new SocketTimeoutException(e.toString());
 		}catch (NoHttpResponseException e) {
-			logger.debug("connection["+task.getUrl()+"] error.",e);
-			throw e;
+			throw new SocketTimeoutException(e.toString());
 		}catch(SocketTimeoutException e){
-			logger.debug("connection["+task.getUrl()+"] error.",e);
 			throw e;
 		}catch(RuntimeException e){
-			logger.debug("connection["+task.getUrl()+"] error.",e);
+			logger.error("execute target[{}] unknow exception.",task.getUrl(),e);
 			return null;
 		}catch(ClientProtocolException e){
-			logger.error("executing post url["+task.getUrl()+"].",e);
 			throw new SocketTimeoutException(e.getMessage());
 		}catch(IOException e){
-			logger.error("executing post url["+task.getUrl()+"].",e);
 			throw new CoreException(e);
 		}catch(Exception e){
-			logger.error("executing post url["+task.getUrl()+"].",e);
 			throw new CoreException(e);
 		}
 	}
@@ -317,8 +302,6 @@ public class HttpHandler {
 				response.close();
 			}
 		}catch(Exception e){
-			logger.error("close http resources error.",e);
-			e.printStackTrace();
 			throw new CoreException("close http resources error."+e);
 		}
 	}
