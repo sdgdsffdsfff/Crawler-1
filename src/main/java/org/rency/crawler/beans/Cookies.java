@@ -1,10 +1,10 @@
 package org.rency.crawler.beans;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.rency.common.utils.tool.DateUtils;
 
 public class Cookies implements Serializable{
 
@@ -20,10 +20,10 @@ public class Cookies implements Serializable{
 	private boolean isSecure;
 	private int version;
 	private String path;
-	private Date execDate;
+	private String execDate;
 	
 	public Cookies(){
-		this.execDate = new Date();
+		this.execDate = DateUtils.getNowDateTimeMills();
 	}
 	
 	public Cookies(String host,String domian,String cookieName,String cookieValue,boolean isSecure,int version,String path){
@@ -92,11 +92,11 @@ public class Cookies implements Serializable{
 		this.path = path;
 	}
 
-	public Date getExecDate() {
+	public String getExecDate() {
 		return execDate;
 	}
 
-	public void setExecDate(Date execDate) {
+	public void setExecDate(String execDate) {
 		this.execDate = execDate;
 	}
 

@@ -13,12 +13,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 
+/**
+ * cookie处理
+ * @author rencaiyu
+ *
+ */
 public class CookieHandler{
 	
 	private static final Logger logger = LoggerFactory.getLogger(CookieHandler.class);
 	
 	/**
-	 * @desc 保存Cookie
+	 * @desc 保存Cookie(仅请求方式为POST，且目标域名不为空时保存)
 	 * @date 2014年12月19日 下午2:48:52
 	 * @param task
 	 * @param cookies
@@ -45,7 +50,7 @@ public class CookieHandler{
 	}
 	
 	/**
-	 * 获取Cookies
+	 * 获取Cookies(仅请求方式为POST，且目标域名不为空时获取)
 	 * @param task
 	 * @return
 	 * @throws CoreException

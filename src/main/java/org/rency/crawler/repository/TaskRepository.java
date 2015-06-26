@@ -24,14 +24,6 @@ public interface TaskRepository {
 	public Task get(String url) throws StoreException;
 	
 	/**
-	 * 加载任务(共享锁控制)
-	 * @param url
-	 * @return
-	 * @throws StoreException
-	 */
-	public Task load(String url) throws StoreException;
-	
-	/**
 	 * 判断该URL是否已抓过
 	 * @param url
 	 * @return

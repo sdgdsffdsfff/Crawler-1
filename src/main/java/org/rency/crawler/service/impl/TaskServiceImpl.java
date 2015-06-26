@@ -6,6 +6,7 @@ import org.rency.crawler.repository.TaskRepository;
 import org.rency.crawler.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 @Service("taskService")
@@ -17,20 +18,17 @@ public class TaskServiceImpl implements TaskService {
 
 	@Override
 	public boolean save(Task task) throws StoreException {
-		Task t = load(task.getUrl());
-		if(t == null){
-			return taskRepository.save(task) > 0;
-		}
+		try{
+			if(!isFetch(task.getUrl())){
+				return taskRepository.save(task) > 0;
+			}
+		}catch(DuplicateKeyException e){}
 		return false;
 	}
 
 	@Override
 	public Task get(String url) throws StoreException {
 		return taskRepository.get(url);
-	}
-	
-	public Task load(String url) throws StoreException{
-		return taskRepository.load(url);
 	}
 	
 	@Override

@@ -25,7 +25,7 @@
 			<onMismatch>DENY</onMismatch>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logRoot}/default.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<fileNamePattern>${logRoot}/default.log.%d{yyyy-MM-dd HH}</fileNamePattern>
 		</rollingPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
@@ -42,7 +42,7 @@
 			<onMismatch>DENY</onMismatch>
 		</filter>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logRoot}/error.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<fileNamePattern>${logRoot}/error.log.%d{yyyy-MM-dd HH}</fileNamePattern>
 		</rollingPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
@@ -54,7 +54,7 @@
 		<encoder charset="UTF-8" />
 		<file>${logRoot}/common-utils.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logRoot}/common-utils.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<fileNamePattern>${logRoot}/common-utils.log.%d{yyyy-MM-dd HH}</fileNamePattern>
 		</rollingPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
@@ -66,7 +66,7 @@
 		<encoder charset="UTF-8" />
 		<file>${logRoot}/common-dal.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logRoot}/common-dal.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<fileNamePattern>${logRoot}/common-dal.log.%d{yyyy-MM-dd HH}</fileNamePattern>
 		</rollingPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
@@ -78,7 +78,7 @@
 		<encoder charset="UTF-8" />
 		<file>${logRoot}/framework.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${logRoot}/framework.log.%d{yyyy-MM-dd}</fileNamePattern>
+			<fileNamePattern>${logRoot}/framework.log.%d{yyyy-MM-dd HH}</fileNamePattern>
 		</rollingPolicy>
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</Pattern>
@@ -104,15 +104,15 @@
 	</logger>
 	
 	<logger name="org.springframework" additivity="false">
-		<level value="debug" />
+		<level value="info" />
 		<appender-ref ref="FRAMEWORK-APPENDER" />
 	</logger>
 	<logger name="org.apache.ibatis" additivity="false">
-		<level value="debug" />
+		<level value="info" />
 		<appender-ref ref="FRAMEWORK-APPENDER" />
 	</logger>
 	<logger name="org.mybatis.spring" additivity="false">
-		<level value="debug" />
+		<level value="info" />
 		<appender-ref ref="FRAMEWORK-APPENDER" />
 	</logger>
 	

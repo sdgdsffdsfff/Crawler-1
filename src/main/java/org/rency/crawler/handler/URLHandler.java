@@ -1,6 +1,7 @@
 package org.rency.crawler.handler;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
@@ -9,11 +10,35 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.rency.common.utils.exception.CoreException;
 import org.rency.crawler.beans.Task;
+import org.rency.crawler.scheduler.CrawlerScheduler;
 import org.rency.crawler.scheduler.TaskScheduler;
+import org.rency.crawler.utils.CrawlerDict;
 import org.rency.crawler.utils.UrlUtils;
-import org.springframework.http.HttpMethod;
 
 public class URLHandler {
+	
+	/**
+	 * 提取页面超链接
+	 * @param doc
+	 * @param host
+	 * @throws CoreException
+	 */
+	public static void fetchLinked(Document doc,String host) throws CoreException{
+		List<String> areas = CrawlerScheduler.getCfg().getFetchAreas();
+		if(areas == null || areas.size() == 0){
+			fetchHref(doc,host);
+		}else{
+			if(areas.contains(CrawlerDict.CRAWLER_FETCH_PAGE_AREA_HREF)){
+				fetchHref(doc, host);
+			}
+			if(areas.contains(CrawlerDict.CRAWLER_FETCH_PAGE_AREA_FORM)){
+				fetchForm(doc);
+			}
+			if(areas.contains(CrawlerDict.CRAWLER_FETCH_PAGE_AREA_SCRIPT)){
+				fetchScript(doc);
+			}
+		}
+	}
 	
 	/**
 	 * @desc 提取页面中的超链接
@@ -34,8 +59,7 @@ public class URLHandler {
 				Task task = new Task();
 				task.setUrl(url);
 				task.setHost(UrlUtils.getHost(url));
-				task.setHttpMethod(HttpMethod.GET);
-				TaskScheduler.fetch(task);
+				TaskScheduler.save(task);
 			}
 		}catch(CoreException e){
 			throw e;

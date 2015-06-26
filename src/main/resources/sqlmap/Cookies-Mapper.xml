@@ -37,7 +37,7 @@
 		<if test="path != null || path != ''">
 			path = #{path},
 		</if>
-		<if test="execDate != null">
+		<if test="execDate != null || execDate !=''">
 			execDate = #{execDate},
 		</if>
 		where host = #{host}

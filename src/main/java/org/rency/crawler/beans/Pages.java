@@ -1,10 +1,10 @@
 package org.rency.crawler.beans;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.rency.common.utils.tool.DateUtils;
 
 public class Pages implements Serializable {
 
@@ -50,10 +50,11 @@ public class Pages implements Serializable {
 	 * 是否已创建索引
 	 */
 	private boolean isCreateIndex;
-	private Date execDate;
+	private String execDate;
 	
 	public Pages(){
 		this.isCreateIndex = false;
+		this.execDate = DateUtils.getNowDateTimeMills();
 	}
 
 	public String getUrl() {
@@ -144,12 +145,12 @@ public class Pages implements Serializable {
 	}
 
 
-	public Date getExecDate() {
+	public String getExecDate() {
 		return execDate;
 	}
 
 
-	public void setExecDate(Date execDate) {
+	public void setExecDate(String execDate) {
 		this.execDate = execDate;
 	}
 

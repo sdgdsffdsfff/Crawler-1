@@ -45,7 +45,7 @@
 		<if test="isCreateIndex == true">
 			isCreateIndex=#{isCreateIndex},
 		</if>
-		<if test="execDate != null">
+		<if test="execDate != null || execDate !=''">
 			execDate=#{execDate},
 		</if>
 		where url=#{url} and sign=#{sign}

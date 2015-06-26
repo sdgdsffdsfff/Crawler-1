@@ -1,10 +1,10 @@
 package org.rency.crawler.beans;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
+import org.rency.common.utils.tool.DateUtils;
 import org.springframework.http.HttpMethod;
 
 /**
@@ -21,11 +21,6 @@ public class Task implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 6004790568824598869L;
-
-	/**
-	 * 抓取该任务的爬虫标示
-	 */
-	private String crawlerId;
 	
 	/**
 	 * 抓取地址
@@ -33,14 +28,24 @@ public class Task implements Serializable{
 	private String url;
 	
 	/**
-	 * 抓取域名
+	 * 目标域名
 	 */
 	private String host;
+	
+	/**
+	 * 爬虫标示
+	 */
+	private String crawlerId;
 	
 	/**
 	 * 是否已下载
 	 */
 	private boolean isDownload;
+	
+	/**
+	 * 是否需要抓取
+	 */
+	private boolean needFetch;
 	
 	/**
 	 * 抓取状态
@@ -67,14 +72,16 @@ public class Task implements Serializable{
 	 */
 	private String params;
 	
-	private Date execDate;
+	private String execDate;
 	
 	public Task(){
 		this.isDownload = false;
-		this.statusCode = 0;
-		this.retryCount = 0;
+		this.needFetch = true;		
 		this.httpMethod = HttpMethod.GET;
-		this.execDate = new Date();
+		this.execDate = DateUtils.getNowDateTimeMills();
+	}
+	
+	public Task(String everyThing){
 	}
 
 	public String getCrawlerId() {
@@ -107,6 +114,14 @@ public class Task implements Serializable{
 
 	public void setDownload(boolean isDownload) {
 		this.isDownload = isDownload;
+	}
+
+	public boolean isNeedFetch() {
+		return needFetch;
+	}
+
+	public void setNeedFetch(boolean needFetch) {
+		this.needFetch = needFetch;
 	}
 
 	public int getStatusCode() {
@@ -149,11 +164,11 @@ public class Task implements Serializable{
 		this.params = params;
 	}
 
-	public Date getExecDate() {
+	public String getExecDate() {
 		return execDate;
 	}
 
-	public void setExecDate(Date execDate) {
+	public void setExecDate(String execDate) {
 		this.execDate = execDate;
 	}
 	

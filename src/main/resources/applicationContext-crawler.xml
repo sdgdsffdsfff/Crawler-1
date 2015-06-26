@@ -89,24 +89,12 @@
     	<property name="dataSource" ref="dataSource" />  
 	</bean> 
 	
-	<!-- 抓取线程池 -->
-	<bean id="fetchTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">  
-        <property name="corePoolSize" value="${fetch.thread.corePoolSize}" />  
-        <property name="maxPoolSize" value="${fetch.thread.maxPoolSize}" />  
-        <property name="queueCapacity" value="${fetch.thread.queueCapacity}" />  
-        <property name="keepAliveSeconds" value="${fetch.thread.keepAliveSeconds}" />  
-        <property name="rejectedExecutionHandler">
-        	<!-- 拒绝执行任务的具体操作，AbortPolicy表示抛出RejectedExecutionException异常 -->
-            <bean class="java.util.concurrent.ThreadPoolExecutor$AbortPolicy" />  
-        </property>  
-    </bean>
-    
-    <!-- 存储线程池 -->
-	<bean id="storeTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">  
-        <property name="corePoolSize" value="${store.thread.corePoolSize}" />  
-        <property name="maxPoolSize" value="${store.thread.maxPoolSize}" />  
-        <property name="queueCapacity" value="${store.thread.queueCapacity}" />  
-        <property name="keepAliveSeconds" value="${store.thread.keepAliveSeconds}" />  
+	<!-- 爬虫线程池 -->
+	<bean id="crawlerTaskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">  
+        <property name="corePoolSize" value="${thread.corePoolSize}" />  
+        <property name="maxPoolSize" value="${thread.maxPoolSize}" />  
+        <property name="queueCapacity" value="${thread.queueCapacity}" />  
+        <property name="keepAliveSeconds" value="${thread.keepAliveSeconds}" />  
         <property name="rejectedExecutionHandler">
         	<!-- 拒绝执行任务的具体操作，AbortPolicy表示抛出RejectedExecutionException异常 -->
             <bean class="java.util.concurrent.ThreadPoolExecutor$AbortPolicy" />  
@@ -114,10 +102,21 @@
     </bean>
     
     <bean id="httpHandler" class="org.rency.crawler.handler.HttpHandler">
-    	<property name="userAgentXmlPath" value="${crawler.http.userAgentXmlPath}" />
+    	<property name="userAgentXmlPath" value="${http.userAgentXmlPath}" />
+    	<property name="socketTimeout" value="${http.socket.timeout}" />
+    	<property name="connectionTimeout" value="${http.connection.timeout}" />
     </bean>
     
     <!-- 爬虫参数注入 -->
-    <bean class="org.rency.crawler.utils.CrawlerResources" />
+    <bean id="crawlerResources" class="org.rency.crawler.utils.CrawlerResources">
+    	<property name="fetchDepth" value="${fetch.depth}" />
+    	<property name="fetchFollowRedirects" value="${fetch.followRedirects}" />
+    	<property name="fetchPolitenessDelay" value="${fetch.politenessDelay}" />
+    	<property name="fetchIncludeHttpsPages" value="${fetch.includeHttpsPages}" />
+    	<property name="fetchMaxDownloadSize" value="${fetch.maxDownloadSize}" />
+    </bean>
+    
+    <!-- 爬虫监视器 -->
+    <bean id="crawlerMonitor" class="org.rency.crawler.monitor.CrawlerMonitor" />
 	
 </beans>

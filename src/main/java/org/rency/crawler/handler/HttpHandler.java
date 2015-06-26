@@ -9,10 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.net.ssl.SSLHandshakeException;
+
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpRequest;
 import org.apache.http.NameValuePair;
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -29,6 +34,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HttpContext;
+import org.apache.http.protocol.HttpCoreContext;
 import org.rency.common.utils.exception.CoreException;
 import org.rency.common.utils.exception.NotModifiedException;
 import org.rency.common.utils.tool.ConvertUtils;
@@ -47,7 +54,16 @@ public class HttpHandler {
 	
 	private String userAgentXmlPath;
 	
-	private final int timeout = 5000;
+	/**
+     * Socket超时时间
+     */
+    private int socketTimeout;
+    
+    /**
+     * 连接超时时间设置
+     */
+    private int connectionTimeout;
+    
 	private final int maxTotal = 100;
         
     private HttpClientContext context = HttpClientContext.create();
@@ -76,11 +92,38 @@ public class HttpHandler {
     		httpClient = HttpClients.custom()
     				.setConnectionManager(cm)
     				.setRedirectStrategy(new LaxRedirectStrategy())
-    				.setDefaultCookieStore(cookieStore).build();
+    				.setDefaultCookieStore(cookieStore)
+    				.setRetryHandler(new HttpRequestRetryHandler() {
+						@Override
+						public boolean retryRequest(IOException exception, int executionCount,HttpContext context) {
+							if(executionCount >= CrawlerDict.RETRY_COUNT){
+								return false;
+							}
+							if(exception instanceof NoHttpResponseException){
+								return true;
+							}
+							if(exception instanceof ConnectionPoolTimeoutException){
+								return true;
+							}
+							if(exception instanceof SocketTimeoutException){
+								return true;
+							}
+							if(exception instanceof SSLHandshakeException){
+								return false;
+							}
+							HttpRequest request = (HttpRequest) context.getAttribute(HttpCoreContext.HTTP_REQUEST);
+							boolean idempotent = !(request instanceof HttpEntityEnclosingRequest);
+							if(idempotent){
+								return true;
+							}
+							return false;
+						}
+					})
+    				.build();
     	}    	
     	
     	if(requestConfig == null){
-    		requestConfig = RequestConfig.custom().setSocketTimeout(timeout).setConnectTimeout(timeout).setConnectionRequestTimeout(timeout).setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY).build();
+    		requestConfig = RequestConfig.custom().setSocketTimeout(socketTimeout).setConnectTimeout(connectionTimeout).setConnectionRequestTimeout(connectionTimeout).setCookieSpec(CookieSpecs.BROWSER_COMPATIBILITY).build();
     	}
     	
     }
@@ -329,5 +372,16 @@ public class HttpHandler {
 
 	public void setUserAgentXmlPath(String userAgentXmlPath) {
 		this.userAgentXmlPath = userAgentXmlPath;
+	}
+
+	
+
+	public void setSocketTimeout(int socketTimeout) {
+		this.socketTimeout = socketTimeout;
+	}
+	
+
+	public void setConnectionTimeout(int connectionTimeout) {
+		this.connectionTimeout = connectionTimeout;
 	}
 }

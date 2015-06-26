@@ -13,7 +13,9 @@ import org.jsoup.nodes.Document;
 import org.rency.common.utils.domain.SpringContextHolder;
 import org.rency.crawler.beans.Cookies;
 import org.rency.crawler.beans.Task;
+import org.rency.crawler.scheduler.TaskScheduler;
 import org.rency.crawler.service.TaskService;
+import org.rency.crawler.utils.ConvertUtils;
 import org.rency.crawler.utils.UrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,10 @@ public class FetchHandler{
 	
 	public void handler(Task task){
 		try{
+			/*** 判断目标是否抓取过  ***/
+			if(taskService.isFetch(task.getUrl())){
+				return ;
+			}
 			parse(task);
 		}catch(SocketTimeoutException e){
 			RetryHandler.retryTask(task, taskService);
@@ -47,60 +53,42 @@ public class FetchHandler{
 	}
 	
 	/**
-	 * @desc 解析页面
+	 * @desc 解析页面，提取网络目标
 	 * @date 2015年1月8日 下午3:54:31
 	 * @throws Exception
 	 */
 	private void parse(Task task) throws Exception{
 		try{
-			//判断URL是否已访问过
-			if(taskService.isFetch(task.getUrl())){
-				return ;
-			}
 			
-			//获取cookie
+			/******************** 1.获取cookie ********************/
 			Cookies cookies = CookieHandler.getCookie(task);
 			
-			//HttpClient组件请求Http
+			/******************** 2.访问目标网络 ********************/
 			HttpHandler httpHandler= SpringContextHolder.getBean(HttpHandler.class);
 			CloseableHttpResponse response = httpHandler.execute(task,cookies);
 			if(response == null){
 				return;
 			}
-			//获取页面
 			HttpEntity entity = response.getEntity();
 			String html = EntityUtils.toString(entity);
 			httpHandler.closeResources(response);
 			Document doc = Jsoup.parse(html);
-			String uri = StringUtils.isBlank(task.getHost()) ? UrlUtils.getHost(doc.baseUri()) : task.getHost();
+			String host = StringUtils.isBlank(task.getHost()) ? UrlUtils.getHost(doc.baseUri()) : task.getHost();
 			
-			//保存cookie
+			/******************** 3.保存cookie ********************/
 			CookieHandler.setCookies(task,httpHandler.getCookieStore().getCookies());
 			
-			/**
-			 * 提取页面中Href超链接
-			 */
-			URLHandler.fetchHref(doc,uri);
-			
-			/**
-			 * 提取表单的Action
-			 */
-			URLHandler.fetchForm(doc);
-			
-			/**
-			 * 解析执行Javascript代码
-			 */
-			URLHandler.fetchScript(doc);
-			
-			//更新队列任务状态
-			task.setHost(uri);
+			/******************** 4.更新任务状态 ********************/
+			task.setHost(host);
 			task.setStatusCode(httpHandler.getStatusCode());
 			taskService.update(task);
 			
-			/**
-			 * 提交保存页面任务
-			 */
-			//taskExecutor.execute(new TaskHandler(ConvertUtils.toPages(task, doc)));
+			/******************** 5.保存成功页面 ********************/
+			TaskScheduler.store(ConvertUtils.toPages(task, doc));
+			
+			/******************** 6.提取网络目标 ********************/
+			URLHandler.fetchLinked(doc,host);			
+			
 		}catch(RejectedExecutionException e){
 			return;
 		}catch(SocketTimeoutException e){

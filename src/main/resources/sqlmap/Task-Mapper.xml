@@ -5,24 +5,20 @@
 	<cache  eviction="FIFO" flushInterval="60000" size="512" readOnly="false"/>
 	
 	<insert id="save" parameterType="Task">
-		insert into t_crawler_task (crawlerId, url, host, isDownload, statusCode, retryCount, lastModified, httpMethod, params, execDate)
-		values (#{crawlerId},#{url},#{host},#{isDownload},#{statusCode},#{retryCount},#{lastModified},#{httpMethod},#{params},#{execDate});
+		insert into t_crawler_task (crawlerId, url, host, isDownload, needFetch, statusCode, retryCount, lastModified, httpMethod, params, execDate)
+		values (#{crawlerId},#{url},#{host},#{isDownload},#{needFetch},#{statusCode},#{retryCount},#{lastModified},#{httpMethod},#{params},#{execDate});
 	</insert>
 	
 	<select id="get" parameterType="String" resultType="Task">
-		select * from t_crawler_task where url=#{url} order by execDate
+		select * from t_crawler_task where url=#{url}
 	</select>
-	
-	<select id="load" parameterType="String" resultType="Task">
-		select * from t_crawler_task where url=#{url} order by execDate for update
-	</select>
-	
+
 	<select id="isFetch" parameterType="String" resultType="int">
-		select count(url) from t_crawler_task where url=#{url} and statusCode=200 and isDownload=false
+		select count(url) from t_crawler_task where url=#{url} and statusCode=200 and isDownload=false and needFetch=true
 	</select>
 	
 	<select id="getTop" resultType="Task">
-		select * from t_crawler_task where statusCode != 200 and isDownload=false order by execDate limit 1
+		select * from t_crawler_task where statusCode != 200 and isDownload=false and needFetch=true order by execDate limit 1
 	</select>
 	
 	<select id="getCount" resultType="int">
@@ -34,7 +30,7 @@
 	</select>
 
 	<select id="getDownloadWithOne" resultType="Task">
-		select * from t_crawler_task where and isDownload=false and statusCode =200 order by execDate limit 1  for update
+		select * from t_crawler_task where and isDownload=false and statusCode =200 order by execDate limit 1
 	</select>
 	
 	<update id="update" parameterType="Task">
@@ -45,6 +41,9 @@
 			</if>
 			<if test="isDownload == true">
 				isDownload = #{isDownload},
+			</if>
+			<if test="needFetch == true">
+				needFetch = #{needFetch},
 			</if>
 			<if test="statusCode != 0">
 				statusCode = #{statusCode},
@@ -61,7 +60,7 @@
 			<if test="params != null || params != ''">
 				params = #{params},
 			</if>
-			<if test="execDate != null">
+			<if test="execDate != null || execDate !=''">
 				execDate = #{execDate}
 			</if>
 		</trim>

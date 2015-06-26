@@ -9,8 +9,6 @@ public interface TaskService {
 	
 	public Task get(String url) throws StoreException;
 	
-	public Task load(String url) throws StoreException;
-	
 	public boolean isFetch(String url) throws StoreException; 
 	
 	public Task getTop() throws StoreException;

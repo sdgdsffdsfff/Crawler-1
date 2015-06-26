@@ -68,7 +68,7 @@ public class CrawlerSchedulerTest {
 	@Test
 	public void testStart() throws CoreException{
 		Configuration cfg = new Configuration();
-		cfg.setStartAddr("http://www.itzhai.com/");
+		cfg.setSeed("http://www.itzhai.com/");
 		crawlerScheduler.start(cfg);
 	}
 

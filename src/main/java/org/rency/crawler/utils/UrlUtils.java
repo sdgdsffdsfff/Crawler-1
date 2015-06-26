@@ -18,6 +18,18 @@ public class UrlUtils {
 	* @author Administrator
 	* @date 2015年1月18日 下午2:33:45
 	* @param href URL路径
+	* @return
+	* @throws
+	 */
+	public static String getFillUrl(String href){
+		return getFillUrl(href,getHost(href));
+	}
+	
+	/**
+	 * @description:获取完整的URL路径
+	* @author Administrator
+	* @date 2015年1月18日 下午2:33:45
+	* @param href URL路径
 	* @param host 域名
 	* @return
 	* @throws
@@ -35,7 +47,7 @@ public class UrlUtils {
 		if(href.startsWith("//") || href.startsWith("/")){
 			href = href.substring(1);
 		}
-		if(href.startsWith("javascript:") || href.startsWith("mailto:") || href.startsWith("#") || href.startsWith(host+"#")){
+		if(href.toLowerCase().startsWith("javascript:") || href.toLowerCase().startsWith("mailto:") || href.toLowerCase().startsWith("#") || href.toLowerCase().startsWith(host+"#")){
 			return "";
 		}
 		Matcher matcher = Pattern.compile("((https|http|ftp|rtsp|mms)?://)").matcher(href);
