@@ -200,8 +200,8 @@
 	  <version>${common.version}</version>
 	</dependency>
 	<dependency>
-	  <groupId>org.rency.dal</groupId>
-	  <artifactId>common-dal</artifactId>
+	  <groupId>org.rency.sequence</groupId>
+	  <artifactId>common-sequence</artifactId>
 	  <version>${common.version}</version>
 	</dependency>
 	

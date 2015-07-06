@@ -14,8 +14,8 @@ import org.rency.crawler.beans.Configuration;
 import org.rency.crawler.service.CookiesService;
 import org.rency.crawler.service.PagesService;
 import org.rency.crawler.service.TaskService;
-import org.rency.dal.sequence.Sequence;
-import org.rency.dal.sequence.service.SequenceRepository;
+import org.rency.sequence.Sequence;
+import org.rency.sequence.service.SequenceRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
