@@ -17,12 +17,12 @@
     <context:component-scan base-package="org.rency.crawler" />
     
     <import resource="classpath*:applicationContext-common-utils.xml"/>
-    <import resource="classpath*:applicationContext-common-dal.xml"/>
+    <import resource="classpath*:applicationContext-common-sequence.xml"/>
+    <import resource="classpath*:applicationContext-restful.xml"/>
     
     <bean id="crawlerAspect" class="org.rency.crawler.aspect.CrawlerAspect" />
 	<aop:config proxy-target-class="true">
 		<aop:pointcut id="crawlerServicePointcut" expression="execution(public * org.rency.crawler.service.impl..*.*(..))" />
-		<aop:advisor advice-ref="txAdvice" pointcut-ref="crawlerServicePointcut" /><!-- 事物控制 -->
 		<aop:aspect ref="crawlerAspect"><!-- 切面控制 -->
 			<aop:before pointcut-ref="crawlerServicePointcut" method="beforeAdvice" />
 			<aop:after-returning pointcut-ref="crawlerServicePointcut" method="afterAdvice" />
@@ -64,24 +64,6 @@
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 		<property name="basePackage" value="org.rency.crawler.repository" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
-	</bean>
-	
-	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-		<property name="dataSource" ref="dataSource"></property>
-		<property name="hibernateProperties">
-			<props>
-    			<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
-				<prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
-				<prop key="hibernate.show_sql">true</prop>
-				<prop key="hibernate.format_sql">true</prop>
-				<prop key="hibernate.hbm2ddl.auto">update</prop>
-    		</props>
-		</property>
-		<property name="packagesToScan">
-			<list>
-				<value></value>
-			</list>
-		</property>
 	</bean>
 	
 	<!-- 配置事务 -->  
